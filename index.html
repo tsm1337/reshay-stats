@@ -13,6 +13,7 @@ h1{font-size:1.5rem;margin:0}h2{font-size:1rem;margin:0 0 10px}
 .k{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.k span{display:block;color:var(--muted);font-size:.8rem}.k b{font-size:1.6rem;font-variant-numeric:tabular-nums;font-weight:600}
 .tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.85rem}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
 svg{width:100%;height:auto;display:block}
+.bar{display:grid;grid-template-columns:minmax(0,9rem) 1fr 3.5rem;gap:8px;align-items:center;margin:5px 0;font-size:.85rem}.bar i{display:block;height:12px;border-radius:4px;background:var(--a1)}.bar b{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
 </style></head><body><main>
 <div><h1>Статистика «Решай сам»</h1><p class="m" id="upd">Загрузка…</p></div>
 <div class="grid">
@@ -20,6 +21,11 @@ svg{width:100%;height:auto;display:block}
 <section class="card"><h2>TikTok</h2><div class="k"><div><span>Просмотры</span><b id="tv">—</b></div><div><span>Лайки</span><b id="tl">—</b></div><div><span>Комментарии</span><b id="tc">—</b></div><div><span>Подписчики</span><b id="ts">—</b></div></div><p class="m" id="tu"></p></section>
 </div>
 <section class="card"><h2>Просмотры YouTube по времени</h2><div id="ch"></div></section>
+<section class="card" id="an" hidden><h2>Аналитика YouTube</h2><p class="m" id="anu"></p>
+<div class="k" style="margin:10px 0"><div><span>Время просмотра, мин</span><b id="aw">—</b></div><div><span>Новых подписчиков</span><b id="as">—</b></div></div>
+<h2 style="margin-top:14px">Просмотры по дням</h2><div id="ad"></div></section>
+<div class="grid" id="an2" hidden><section class="card"><h2>Источники трафика</h2><div id="at"></div></section><section class="card"><h2>Страны</h2><div id="ac"></div></section></div>
+<section class="card" id="an3" hidden><h2>Удержание по роликам</h2><div class="tw"><table><thead><tr><th>Ролик</th><th>Просмотры</th><th>Мин. просмотра</th><th>Ср. длительность, с</th><th>Досмотрено, %</th><th>Подписчики</th></tr></thead><tbody id="ar"></tbody></table></div></section>
 <section class="card"><h2>По роликам</h2><div class="tw"><table><thead><tr><th>Платформа</th><th>Ролик</th><th>Просмотры</th><th>Лайки</th><th>Комментарии</th></tr></thead><tbody id="rows"></tbody></table></div></section>
 </main>
 <script>
@@ -49,5 +55,31 @@ const add=(n,a,tx)=>{const e=document.createElementNS(ns,n);for(const k in a)e.s
 add('text',{x:m.l,y:H-6,'font-size':11,fill:'var(--muted)'},fd(new Date(x0)));add('text',{x:W-m.r,y:H-6,'text-anchor':'end','font-size':11,fill:'var(--muted)'},fd(new Date(x1)));
 add('path',{d,fill:'none',stroke:'var(--a1)','stroke-width':2});add('circle',{cx:X(x1),cy:Y(pts[pts.length-1][1]),r:4,fill:'var(--a1)'});
 el.replaceChildren(s);
+})();
+
+(async()=>{
+const a=await get('analytics.json');
+if(!a||a.error||!a.daily)return;
+const L=await get('latest.json');const names={};((L&&L.videos)||[]).forEach(v=>names[v.id]=v.title.replace(/^Заказ без адреса · /,'').replace(/ #shorts$/,''));
+['an','an2','an3'].forEach(i=>$(i).hidden=false);
+$('anu').textContent='Обновлено: '+new Date(a.updated.replace('Z',':00Z')).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+' · данные YouTube Analytics приходят с задержкой до суток';
+$('aw').textContent=f(Math.round(a.daily.reduce((s,r)=>s+(r.estimatedMinutesWatched||0),0)));
+$('as').textContent=f(a.daily.reduce((s,r)=>s+(r.subscribersGained||0),0));
+const bars=(id,rows,key,label)=>{const mx=Math.max(1,...rows.map(r=>r.views));$(id).replaceChildren(...rows.map(r=>{const d=document.createElement('div');d.className='bar';const n=document.createElement('span');n.textContent=label(r[key]);const w=document.createElement('div');const i=document.createElement('i');i.style.width=(100*r.views/mx)+'%';w.appendChild(i);const b=document.createElement('b');b.textContent=f(r.views);d.append(n,w,b);return d}))};
+const TR={ADVERTISING:'Реклама',ANNOTATION:'Аннотации',CAMPAIGN_CARD:'Карточки',END_SCREEN:'Конечные заставки',EXT_URL:'Внешние сайты',HASHTAGS:'Хэштеги',LIVE_REDIRECT:'Редирект',NOTIFICATION:'Уведомления',NO_LINK_OTHER:'Прямые и другое',NO_LINK_EMBEDDED:'Встроенные',PLAYLIST:'Плейлисты',PROMOTED:'Продвижение',RELATED_VIDEO:'Рекомендации',SHORTS:'Лента Shorts',SUBSCRIBER:'Подписки',YT_CHANNEL:'Страница канала',YT_OTHER_PAGE:'Другие страницы YouTube',YT_PLAYLIST_PAGE:'Страница плейлиста',YT_SEARCH:'Поиск YouTube'};
+bars('at',a.traffic||[],'insightTrafficSourceType',k=>TR[k]||k);bars('ac',a.countries||[],'country',k=>k);
+$('ar').replaceChildren(...(a.videos||[]).map(r=>{const tr=document.createElement('tr');[names[r.video]||r.video,f(r.views),f(Math.round(r.estimatedMinutesWatched)),f(Math.round(r.averageViewDuration)),(r.averageViewPercentage!=null?Math.round(r.averageViewPercentage)+'%':'—'),f(r.subscribersGained)].forEach(x=>{const td=document.createElement('td');td.textContent=x;tr.appendChild(td)});return tr}));
+const dd=a.daily.map(r=>[new Date(r.day+'T00:00:00Z').getTime(),r.views]);const el=$('ad');
+if(dd.length<2){el.innerHTML='<p class="m">Данных по дням пока мало.</p>';return}
+const W=640,H=180,m={l:40,r:12,t:10,b:24},x0=dd[0][0],x1=dd[dd.length-1][0],ym=Math.max(1,...dd.map(p=>p[1]))*1.15;
+const X=t=>m.l+(t-x0)/(x1-x0)*(W-m.l-m.r),Y=v=>H-m.b-v/ym*(H-m.t-m.b);
+const ns='http://www.w3.org/2000/svg',sv=document.createElementNS(ns,'svg');sv.setAttribute('viewBox',`0 0 ${W} ${H}`);
+const add=(n,at,tx)=>{const e=document.createElementNS(ns,n);for(const k in at)e.setAttribute(k,at[k]);if(tx!=null)e.textContent=tx;sv.appendChild(e)};
+[0,.5,1].forEach(q=>{const v=ym/1.15*q;add('line',{x1:m.l,x2:W-m.r,y1:Y(v),y2:Y(v),stroke:'var(--line)'});add('text',{x:m.l-6,y:Y(v)+4,'text-anchor':'end','font-size':11,fill:'var(--muted)'},f(Math.round(v)))});
+const dl=t=>new Date(t).toLocaleDateString('ru-RU',{day:'numeric',month:'short'});
+add('text',{x:m.l,y:H-6,'font-size':11,fill:'var(--muted)'},dl(x0));add('text',{x:W-m.r,y:H-6,'text-anchor':'end','font-size':11,fill:'var(--muted)'},dl(x1));
+add('path',{d:dd.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join(''),fill:'none',stroke:'var(--a1)','stroke-width':2});
+add('circle',{cx:X(x1),cy:Y(dd[dd.length-1][1]),r:4,fill:'var(--a1)'});
+el.replaceChildren(sv);
 })();
 </script></body></html>
