@@ -20,12 +20,17 @@ svg{width:100%;height:auto;display:block}
 <section class="card"><h2>YouTube Shorts</h2><div class="k"><div><span>Просмотры</span><b id="yv">—</b></div><div><span>Лайки</span><b id="yl">—</b></div><div><span>Комментарии</span><b id="yc">—</b></div><div><span>Подписчики</span><b id="ys">—</b></div></div></section>
 <section class="card"><h2>TikTok</h2><div class="k"><div><span>Просмотры</span><b id="tv">—</b></div><div><span>Лайки</span><b id="tl">—</b></div><div><span>Комментарии</span><b id="tc">—</b></div><div><span>Подписчики</span><b id="ts">—</b></div></div><p class="m" id="tu"></p></section>
 </div>
+<section class="card"><h2>Сводка YouTube</h2><div class="k" style="grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))"><div><span>Просмотров за 24 ч</span><b id="s24">—</b></div><div><span>Просмотров за 1 ч</span><b id="s1">—</b></div><div><span>Лайки / просмотры</span><b id="ser">—</b></div><div><span>Комментарии / просмотры</span><b id="scr">—</b></div><div><span>Ср. просмотров на ролик</span><b id="sav">—</b></div><div><span>Подписчиков на 1000 просм.</span><b id="ssp">—</b></div></div></section>
 <section class="card"><h2>Просмотры YouTube по времени</h2><div id="ch"></div></section>
+<section class="card"><h2>Рост просмотров по роликам</h2><div id="chv"></div><p class="m" id="chvl"></p></section>
 <section class="card" id="an" hidden><h2>Аналитика YouTube</h2><p class="m" id="anu"></p>
 <div class="k" style="margin:10px 0"><div><span>Время просмотра, мин</span><b id="aw">—</b></div><div><span>Новых подписчиков</span><b id="as">—</b></div></div>
 <h2 style="margin-top:14px">Просмотры по дням</h2><div id="ad"></div></section>
 <div class="grid" id="an2" hidden><section class="card"><h2>Источники трафика</h2><div id="at"></div></section><section class="card"><h2>Страны</h2><div id="ac"></div></section></div>
-<section class="card" id="an3" hidden><h2>Удержание по роликам</h2><div class="tw"><table><thead><tr><th>Ролик</th><th>Просмотры</th><th>Мин. просмотра</th><th>Ср. длительность, с</th><th>Досмотрено, %</th><th>Подписчики</th></tr></thead><tbody id="ar"></tbody></table></div></section>
+<div class="grid" id="an4" hidden><section class="card"><h2>Возраст и пол, % зрителей</h2><div id="ade"></div></section><section class="card"><h2>Устройства</h2><div id="adv"></div><h2 style="margin-top:14px">Подписчики / нет</h2><div id="asb"></div></section></div>
+<section class="card" id="an5" hidden><h2>Кривая удержания (доля зрителей по ходу ролика)</h2><div id="aret"></div><p class="m" id="aretl"></p></section>
+<section class="card" id="an6" hidden><h2>Последние комментарии</h2><div id="acm"></div></section>
+<section class="card" id="an3" hidden><h2>Удержание по роликам</h2><div class="tw"><table><thead><tr><th>Ролик</th><th>Просмотры</th><th>Мин. просмотра</th><th>Ср. длительность, с</th><th>Досмотрено, %</th><th>Подписчики</th><th>Лайки</th><th>Репосты</th></tr></thead><tbody id="ar"></tbody></table></div></section>
 <section class="card"><h2>По роликам</h2><div class="tw"><table><thead><tr><th>Платформа</th><th>Ролик</th><th>Просмотры</th><th>Лайки</th><th>Комментарии</th></tr></thead><tbody id="rows"></tbody></table></div></section>
 </main>
 <script>
@@ -68,7 +73,7 @@ $('as').textContent=f(a.daily.reduce((s,r)=>s+(r.subscribersGained||0),0));
 const bars=(id,rows,key,label)=>{const mx=Math.max(1,...rows.map(r=>r.views));$(id).replaceChildren(...rows.map(r=>{const d=document.createElement('div');d.className='bar';const n=document.createElement('span');n.textContent=label(r[key]);const w=document.createElement('div');const i=document.createElement('i');i.style.width=(100*r.views/mx)+'%';w.appendChild(i);const b=document.createElement('b');b.textContent=f(r.views);d.append(n,w,b);return d}))};
 const TR={ADVERTISING:'Реклама',ANNOTATION:'Аннотации',CAMPAIGN_CARD:'Карточки',END_SCREEN:'Конечные заставки',EXT_URL:'Внешние сайты',HASHTAGS:'Хэштеги',LIVE_REDIRECT:'Редирект',NOTIFICATION:'Уведомления',NO_LINK_OTHER:'Прямые и другое',NO_LINK_EMBEDDED:'Встроенные',PLAYLIST:'Плейлисты',PROMOTED:'Продвижение',RELATED_VIDEO:'Рекомендации',SHORTS:'Лента Shorts',SUBSCRIBER:'Подписки',YT_CHANNEL:'Страница канала',YT_OTHER_PAGE:'Другие страницы YouTube',YT_PLAYLIST_PAGE:'Страница плейлиста',YT_SEARCH:'Поиск YouTube'};
 bars('at',a.traffic||[],'insightTrafficSourceType',k=>TR[k]||k);bars('ac',a.countries||[],'country',k=>k);
-$('ar').replaceChildren(...(a.videos||[]).map(r=>{const tr=document.createElement('tr');[names[r.video]||r.video,f(r.views),f(Math.round(r.estimatedMinutesWatched)),f(Math.round(r.averageViewDuration)),(r.averageViewPercentage!=null?Math.round(r.averageViewPercentage)+'%':'—'),f(r.subscribersGained)].forEach(x=>{const td=document.createElement('td');td.textContent=x;tr.appendChild(td)});return tr}));
+$('ar').replaceChildren(...(a.videos||[]).map(r=>{const tr=document.createElement('tr');[names[r.video]||r.video,f(r.views),f(Math.round(r.estimatedMinutesWatched)),f(Math.round(r.averageViewDuration)),(r.averageViewPercentage!=null?Math.round(r.averageViewPercentage)+'%':'—'),f(r.subscribersGained),f(r.likes),f(r.shares)].forEach(x=>{const td=document.createElement('td');td.textContent=x;tr.appendChild(td)});return tr}));
 const dd=a.daily.map(r=>[new Date(r.day+'T00:00:00Z').getTime(),r.views]);const el=$('ad');
 if(dd.length<2){el.innerHTML='<p class="m">Данных по дням пока мало.</p>';return}
 const W=640,H=180,m={l:40,r:12,t:10,b:24},x0=dd[0][0],x1=dd[dd.length-1][0],ym=Math.max(1,...dd.map(p=>p[1]))*1.15;
@@ -81,5 +86,60 @@ add('text',{x:m.l,y:H-6,'font-size':11,fill:'var(--muted)'},dl(x0));add('text',{
 add('path',{d:dd.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join(''),fill:'none',stroke:'var(--a1)','stroke-width':2});
 add('circle',{cx:X(x1),cy:Y(dd[dd.length-1][1]),r:4,fill:'var(--a1)'});
 el.replaceChildren(sv);
+})();
+
+function lineChart(el,series,opts){
+const W=640,H=opts.h||190,m={l:44,r:12,t:10,b:24};
+const all=series.flatMap(s=>s.pts);if(all.length<2){el.innerHTML='<p class="m">'+(opts.empty||'Мало данных.')+'</p>';return}
+const x0=Math.min(...all.map(p=>p[0])),x1=Math.max(...all.map(p=>p[0])),ym=Math.max(opts.ymax||0,...all.map(p=>p[1]),1)*1.1;
+const X=t=>m.l+(t-x0)/((x1-x0)||1)*(W-m.l-m.r),Y=v=>H-m.b-v/ym*(H-m.t-m.b);
+const ns='http://www.w3.org/2000/svg',sv=document.createElementNS(ns,'svg');sv.setAttribute('viewBox',`0 0 ${W} ${H}`);
+const add=(n,at,tx)=>{const e=document.createElementNS(ns,n);for(const k in at)e.setAttribute(k,at[k]);if(tx!=null)e.textContent=tx;sv.appendChild(e)};
+[0,.5,1].forEach(q=>{const v=ym/1.1*q;add('line',{x1:m.l,x2:W-m.r,y1:Y(v),y2:Y(v),stroke:'var(--line)'});add('text',{x:m.l-6,y:Y(v)+4,'text-anchor':'end','font-size':11,fill:'var(--muted)'},opts.fy?opts.fy(v):f(Math.round(v)))});
+add('text',{x:m.l,y:H-6,'font-size':11,fill:'var(--muted)'},opts.fx(x0));add('text',{x:W-m.r,y:H-6,'text-anchor':'end','font-size':11,fill:'var(--muted)'},opts.fx(x1));
+const C=['var(--a1)','#e8833a','#3aa57a','#b45fd1','#d1495b'];
+series.forEach((s,i)=>{if(s.pts.length)add('path',{d:s.pts.map((p,j)=>(j?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join(''),fill:'none',stroke:C[i%5],'stroke-width':2})});
+el.replaceChildren(sv);
+if(series.length>1){const lg=document.createElement('p');lg.className='m';lg.innerHTML=series.map((s,i)=>'<span style="color:'+C[i%5]+'">■</span> '+s.name.replace(/</g,'&lt;')).join(' &nbsp; ');el.appendChild(lg)}
+}
+const fdate=t=>new Date(t).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const short=t=>t.replace(/^Заказ без адреса · /,'').replace(/ #shorts$/,'');
+(async()=>{
+const [l,h]=await Promise.all([get('latest.json'),get('history.json')]);
+const yv=(l&&l.videos)||[];if(!yv.length)return;
+const V=sum(yv,'views'),Lk=sum(yv,'likes'),Cm=sum(yv,'comments');
+$('ser').textContent=V?(100*Lk/V).toFixed(1)+'%':'—';
+$('scr').textContent=V&&Cm!=null?(100*Cm/V).toFixed(1)+'%':'—';
+$('sav').textContent=f(Math.round(V/yv.length));
+$('ssp').textContent=l.subscribers!=null&&V?(1000*l.subscribers/V).toFixed(1):'—';
+const byts={};(h||[]).filter(r=>r.platform==='YouTube').forEach(r=>{(byts[r.id]=byts[r.id]||[]).push([new Date(r.ts.replace('Z',':00Z')).getTime(),r.views,r.title])});
+const tot={};Object.values(byts).forEach(a=>a.forEach(p=>tot[p[0]]=(tot[p[0]]||0)+p[1]));
+const tt=Object.entries(tot).map(([k,v])=>[+k,v]).sort((a,b)=>a[0]-b[0]);
+const last=tt[tt.length-1];
+const gain=ms=>{if(tt.length<2)return null;const tgt=last[0]-ms;let base=tt[0];for(const p of tt){if(p[0]<=tgt)base=p}return last[1]-base[1]};
+$('s24').textContent=f(gain(86400000));$('s1').textContent=f(gain(3600000));
+const ser=Object.values(byts).map(a=>({name:short(a[a.length-1][2]),pts:a.map(p=>[p[0],p[1]])}));
+lineChart($('chv'),ser,{fx:fdate,empty:'График появится после нескольких замеров.'});
+})();
+(async()=>{
+const a=await get('analytics.json');
+if(!a||a.error)return;
+const L=await get('latest.json');const names={};((L&&L.videos)||[]).forEach(v=>names[v.id]=short(v.title));
+const AG={'age13-17':'13–17','age18-24':'18–24','age25-34':'25–34','age35-44':'35–44','age45-54':'45–54','age55-64':'55–64','age65-':'65+'};
+const GN={female:'жен.',male:'муж.',user_specified:'др.'};
+const DV={MOBILE:'Телефоны',DESKTOP:'Компьютеры',TABLET:'Планшеты',TV:'ТВ',GAME_CONSOLE:'Консоли',UNKNOWN_PLATFORM:'Другое'};
+const SB={SUBSCRIBED:'Подписаны',UNSUBSCRIBED:'Не подписаны'};
+const bars2=(id,rows,key,val,label,fmt)=>{const mx=Math.max(1,...rows.map(r=>r[val]));$(id).replaceChildren(...rows.map(r=>{const d=document.createElement('div');d.className='bar';const n=document.createElement('span');n.textContent=label(r);const w=document.createElement('div');const i=document.createElement('i');i.style.width=(100*r[val]/mx)+'%';w.appendChild(i);const b=document.createElement('b');b.textContent=fmt(r[val]);d.append(n,w,b);return d}))};
+const hasD=(a.demo||[]).length,hasDv=(a.devices||[]).length;
+if(hasD||hasDv||(a.subscribed||[]).length){$('an4').hidden=false;
+bars2('ade',(a.demo||[]).slice(0,10),'','viewerPercentage',r=>(AG[r.ageGroup]||r.ageGroup)+' '+(GN[r.gender]||r.gender),v=>v.toFixed(1)+'%');
+bars2('adv',a.devices||[],'','views',r=>DV[r.deviceType]||r.deviceType,f);
+bars2('asb',a.subscribed||[],'','views',r=>SB[r.subscribedStatus]||r.subscribedStatus,f)}
+const ret=a.retention||{},keys=Object.keys(ret).filter(k=>ret[k].length);
+if(keys.length){$('an5').hidden=false;
+lineChart($('aret'),keys.map(k=>({name:names[k]||k,pts:ret[k].map(r=>[r[0],r[1]*100])})),{fx:t=>Math.round(t*100)+'%',fy:v=>Math.round(v)+'%',ymax:100});
+$('aretl').textContent='Ось X — момент ролика, ось Y — % зрителей, смотрящих в этот момент. Значения выше 100% бывают из-за повторных просмотров.'}
+if((a.recent_comments||[]).length){$('an6').hidden=false;
+$('acm').replaceChildren(...a.recent_comments.map(c=>{const d=document.createElement('div');d.style.cssText='padding:8px 0;border-bottom:1px solid var(--line)';const t=document.createElement('div');t.className='m';t.textContent=c.author+' · '+(names[c.video]||'')+' · '+fdate(c.at)+(c.likes?' · ♥ '+c.likes:'');const x=document.createElement('div');const tmp=document.createElement('div');tmp.innerHTML=c.text;x.textContent=tmp.textContent;d.append(t,x);return d}))}
 })();
 </script></body></html>

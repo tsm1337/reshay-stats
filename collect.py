@@ -80,10 +80,38 @@ if CID and CSEC and RTOK:
             names = [c["name"] for c in r.get("columnHeaders", [])]
             return [dict(zip(names, row)) for row in r.get("rows", [])]
 
-        analytics["daily"] = rep("views,estimatedMinutesWatched,subscribersGained,likes,comments", "day", {"sort": "day"})
-        analytics["videos"] = rep("views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained,likes,comments", "video", {"sort": "-views", "maxResults": "50"})
-        analytics["traffic"] = rep("views", "insightTrafficSourceType", {"sort": "-views"})
-        analytics["countries"] = rep("views", "country", {"sort": "-views", "maxResults": "10"})
+        def safe(key, fn):
+            try:
+                analytics[key] = fn()
+            except Exception as ex:
+                analytics[key] = []
+                analytics.setdefault("partial", {})[key] = repr(ex)[:200]
+
+        safe("daily", lambda: rep("views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained,subscribersLost,likes,comments,shares", "day", {"sort": "day"}))
+        safe("videos", lambda: rep("views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained,likes,comments,shares", "video", {"sort": "-views", "maxResults": "50"}))
+        safe("traffic", lambda: rep("views", "insightTrafficSourceType", {"sort": "-views"}))
+        safe("countries", lambda: rep("views", "country", {"sort": "-views", "maxResults": "10"}))
+        safe("demo", lambda: rep("viewerPercentage", "ageGroup,gender", {"sort": "-viewerPercentage"}))
+        safe("devices", lambda: rep("views", "deviceType", {"sort": "-views"}))
+        safe("subscribed", lambda: rep("views,estimatedMinutesWatched", "subscribedStatus", {"sort": "-views"}))
+
+        def retention():
+            out = {}
+            for vid in videos:
+                q = {"ids": "channel==MINE", "startDate": start, "endDate": end, "metrics": "audienceWatchRatio,relativeRetentionPerformance", "dimensions": "elapsedVideoTimeRatio", "filters": "video==" + vid}
+                r = api("https://youtubeanalytics.googleapis.com/v2/reports?" + urllib.parse.urlencode(q))
+                out[vid] = [[row[0], row[1], row[2]] for row in r.get("rows", [])]
+            return out
+        safe("retention", retention)
+
+        def recent_comments():
+            r = api("https://www.googleapis.com/youtube/v3/commentThreads?" + urllib.parse.urlencode({"part": "snippet", "allThreadsRelatedToChannelId": CH, "maxResults": "30", "order": "time"}))
+            out = []
+            for it in r.get("items", []):
+                sn = it["snippet"]["topLevelComment"]["snippet"]
+                out.append({"video": it["snippet"].get("videoId"), "author": sn.get("authorDisplayName"), "text": sn.get("textDisplay", "")[:300], "likes": sn.get("likeCount", 0), "at": sn.get("publishedAt")})
+            return out
+        safe("recent_comments", recent_comments)
         analytics["totals"] = {"start": start, "end": end}
     except Exception as e:
         analytics["error"] = repr(e)[:300]
