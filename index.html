@@ -19,6 +19,7 @@ svg{width:100%;height:auto;display:block}
 <div class="grid">
 <section class="card"><h2>YouTube Shorts</h2><div class="k"><div><span>Просмотры</span><b id="yv">—</b></div><div><span>Лайки</span><b id="yl">—</b></div><div><span>Комментарии</span><b id="yc">—</b></div><div><span>Подписчики</span><b id="ys">—</b></div></div></section>
 <section class="card"><h2>TikTok</h2><div class="k"><div><span>Просмотры</span><b id="tv">—</b></div><div><span>Лайки</span><b id="tl">—</b></div><div><span>Комментарии</span><b id="tc">—</b></div><div><span>Подписчики</span><b id="ts">—</b></div></div><p class="m" id="tu"></p></section>
+<section class="card"><h2>Instagram</h2><div class="k"><div><span>Просмотры</span><b id="iv">—</b></div><div><span>Лайки</span><b id="il">—</b></div><div><span>Комментарии</span><b id="ic">—</b></div><div><span>Подписчики</span><b id="is">—</b></div></div><p class="m" id="iu"></p></section>
 </div>
 <section class="card"><h2>Сводка YouTube</h2><div class="k" style="grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))"><div><span>Просмотров за 24 ч</span><b id="s24">—</b></div><div><span>Просмотров за 1 ч</span><b id="s1">—</b></div><div><span>Лайки / просмотры</span><b id="ser">—</b></div><div><span>Комментарии / просмотры</span><b id="scr">—</b></div><div><span>Ср. просмотров на ролик</span><b id="sav">—</b></div><div><span>Подписчиков на 1000 просм.</span><b id="ssp">—</b></div></div></section>
 <section class="card"><h2>Просмотры YouTube по времени</h2><div id="ch"></div></section>
@@ -39,13 +40,14 @@ const sum=(a,k)=>a.some(x=>x[k]!=null)?a.reduce((s,x)=>s+(x[k]||0),0):null;
 const RAW='https://raw.githubusercontent.com/tsm1337/reshay-stats/main/';
 const get=u=>fetch(RAW+u+'?t='+Date.now()).then(r=>r.json()).catch(()=>null);
 (async()=>{
-const [l,t,h]=await Promise.all([get('latest.json'),get('tiktok.json'),get('history.json')]);
-const yv=(l&&l.videos)||[],tv=(t&&t.videos)||[];
+const [l,t,h,ig]=await Promise.all([get('latest.json'),get('tiktok.json'),get('history.json'),get('instagram.json')]);
+const yv=(l&&l.videos)||[],tv=(t&&t.videos)||[],iv=(ig&&ig.videos)||[];
 $('yv').textContent=f(sum(yv,'views'));$('yl').textContent=f(sum(yv,'likes'));$('yc').textContent=f(sum(yv,'comments'));$('ys').textContent=f(l&&l.subscribers);
 $('tv').textContent=f(sum(tv,'views'));$('tl').textContent=f(sum(tv,'likes'));$('tc').textContent=f(sum(tv,'comments'));$('ts').textContent=f(t&&t.followers);
 const fd=s=>s?new Date(s).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'нет данных';
 $('upd').textContent='YouTube обновлён: '+fd(l&&l.updated);$('tu').textContent='Обновлено вручную: '+fd(t&&t.updated);
-const rows=[...yv.map(v=>['YouTube',v]),...tv.map(v=>['TikTok',v])];
+$('iv').textContent=f(sum(iv,'views'));$('il').textContent=f(sum(iv,'likes'));$('ic').textContent=f(sum(iv,'comments'));$('is').textContent=f(ig&&ig.followers);$('iu').textContent='Обновлено вручную: '+fd(ig&&ig.updated);
+const rows=[...yv.map(v=>['YouTube',v]),...tv.map(v=>['TikTok',v]),...iv.map(v=>['Instagram',v])];
 $('rows').replaceChildren(...rows.map(([p,v])=>{const tr=document.createElement('tr');[p,v.title,f(v.views),f(v.likes),f(v.comments)].forEach(x=>{const td=document.createElement('td');td.textContent=x;tr.appendChild(td)});return tr}));
 const by={};(h||[]).forEach(r=>{by[r.ts]=(by[r.ts]||0)+r.views});
 const pts=Object.entries(by).sort().map(([k,v])=>[new Date(k.replace('Z',':00Z')).getTime(),v]);
