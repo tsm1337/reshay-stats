@@ -25,7 +25,8 @@ svg{width:100%;height:auto;display:block}
 <script>
 const f=n=>n==null?'—':Number(n).toLocaleString('ru-RU'),$=id=>document.getElementById(id);
 const sum=(a,k)=>a.some(x=>x[k]!=null)?a.reduce((s,x)=>s+(x[k]||0),0):null;
-const get=u=>fetch(u+'?t='+Date.now()).then(r=>r.json()).catch(()=>null);
+const RAW='https://raw.githubusercontent.com/tsm1337/reshay-stats/main/';
+const get=u=>fetch(RAW+u+'?t='+Date.now()).then(r=>r.json()).catch(()=>null);
 (async()=>{
 const [l,t,h]=await Promise.all([get('latest.json'),get('tiktok.json'),get('history.json')]);
 const yv=(l&&l.videos)||[],tv=(t&&t.videos)||[];
