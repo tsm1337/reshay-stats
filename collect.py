@@ -21,20 +21,30 @@ def load(name, default):
 
 
 videos = {}
-root = ET.fromstring(get(f"https://www.youtube.com/feeds/videos.xml?channel_id={CH}"))
-for e in root.findall("a:entry", NS):
-    vid = e.find("{http://www.youtube.com/xml/schemas/2015}videoId").text
-    g = e.find("m:group", NS)
-    st = g.find("m:community/m:statistics", NS)
-    rt = g.find("m:community/m:starRating", NS)
-    videos[vid] = {
-        "id": vid,
-        "title": e.find("a:title", NS).text,
-        "published": e.find("a:published", NS).text,
-        "views": int(st.get("views")) if st is not None else 0,
-        "likes": int(rt.get("count")) if rt is not None else 0,
-        "comments": None,
-    }
+rss_err = None
+for _try in range(3):
+    try:
+        root = ET.fromstring(get(f"https://www.youtube.com/feeds/videos.xml?channel_id={CH}"))
+        for e in root.findall("a:entry", NS):
+            vid = e.find("{http://www.youtube.com/xml/schemas/2015}videoId").text
+            g = e.find("m:group", NS)
+            st = g.find("m:community/m:statistics", NS)
+            rt = g.find("m:community/m:starRating", NS)
+            videos[vid] = {
+                "id": vid,
+                "title": e.find("a:title", NS).text,
+                "published": e.find("a:published", NS).text,
+                "views": int(st.get("views")) if st is not None else 0,
+                "likes": int(rt.get("count")) if rt is not None else 0,
+                "comments": None,
+            }
+        break
+    except Exception as ex:
+        rss_err = repr(ex)[:200]
+        import time
+        time.sleep(3)
+if not videos:
+    print("rss failed:", rss_err)
 
 subs = None
 if KEY and videos:
@@ -63,6 +73,11 @@ if CID and CSEC and RTOK:
             req = urllib.request.Request(url, headers={"Authorization": "Bearer " + tok})
             return json.loads(urllib.request.urlopen(req, timeout=30).read())
 
+        if not videos:
+            up = api("https://www.googleapis.com/youtube/v3/channels?" + urllib.parse.urlencode({"part": "contentDetails", "mine": "true"}))["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+            for it in api("https://www.googleapis.com/youtube/v3/playlistItems?" + urllib.parse.urlencode({"part": "snippet,contentDetails", "playlistId": up, "maxResults": "50"}))["items"]:
+                vid = it["contentDetails"]["videoId"]
+                videos[vid] = {"id": vid, "title": it["snippet"]["title"], "published": it["contentDetails"].get("videoPublishedAt") or it["snippet"]["publishedAt"], "views": 0, "likes": 0, "comments": None}
         if videos:
             ids = ",".join(videos)
             for it in api("https://www.googleapis.com/youtube/v3/videos?" + urllib.parse.urlencode({"part": "statistics", "id": ids}))["items"]:
@@ -119,6 +134,9 @@ else:
     analytics["error"] = "no oauth secrets"
 json.dump(analytics, open("analytics.json", "w", encoding="utf-8"), ensure_ascii=False)
 
+if not videos:
+    print("no videos fetched; keeping previous data")
+    raise SystemExit(0)
 rows = sorted(videos.values(), key=lambda v: v["published"])
 prev = load("latest.json", {})
 latest = {"updated": now, "subscribers": subs if subs is not None else prev.get("subscribers"), "videos": rows}
