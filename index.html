@@ -38,7 +38,8 @@ svg{width:100%;height:auto;display:block}
 const f=n=>n==null?'—':Number(n).toLocaleString('ru-RU'),$=id=>document.getElementById(id);
 const sum=(a,k)=>a.some(x=>x[k]!=null)?a.reduce((s,x)=>s+(x[k]||0),0):null;
 const RAW='https://raw.githubusercontent.com/tsm1337/reshay-stats/main/';
-const get=u=>fetch(RAW+u+'?t='+Date.now()).then(r=>r.json()).catch(()=>null);
+const API='https://api.github.com/repos/tsm1337/reshay-stats/contents/';
+const get=u=>fetch(API+u+'?ref=main&t='+Date.now(),{headers:{Accept:'application/vnd.github.raw+json'},cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json()}).catch(()=>fetch(RAW+u+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()).catch(()=>null));
 (async()=>{
 const [l,t,h,ig]=await Promise.all([get('latest.json'),get('tiktok.json'),get('history.json'),get('instagram.json')]);
 const yv=(l&&l.videos)||[],tv=(t&&t.videos)||[],iv=(ig&&ig.videos)||[];
