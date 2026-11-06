@@ -103,7 +103,7 @@
 
   // кот (viewBox 0 0 200 200, сидит, основание y≈190)
   function cat(o = {}) {
-    const eyes = o.eyes ?? 1;
+    const eyes = o.eyes ?? 1, lk = o.look ?? 0, ey = o.blink ? 1.5 : 9;
     return `<g class="cat">
       <path d="M150 182 Q196 170 184 128 Q178 112 168 120 Q178 140 150 160Z" fill="#0f1114"/>
       <path d="M58 190 Q50 110 80 92 L120 92 Q150 110 142 190Z" fill="#111317" stroke="#3a5866" stroke-width="3"/>
@@ -111,8 +111,8 @@
       <path d="M62 62 L66 22 L92 50Z M138 62 L134 22 L108 50Z" fill="#14161b" stroke="#3a5866" stroke-width="3" stroke-linejoin="round"/>
       <path d="M70 52 L70 34 L84 50Z M130 52 L130 34 L116 50Z" fill="#2a2228"/>
       <path d="M70 108 l-3 10 M90 112 l-2 12 M118 110 l2 11" stroke="#22262c" stroke-width="3" stroke-linecap="round"/>
-      <g opacity="${eyes}"><ellipse cx="84" cy="78" rx="10" ry="9" fill="#e2c64b"/><ellipse cx="116" cy="78" rx="10" ry="9" fill="#e2c64b"/>
-      <ellipse cx="84" cy="78" rx="2.4" ry="8" fill="#0a0a0a"/><ellipse cx="116" cy="78" rx="2.4" ry="8" fill="#0a0a0a"/></g>
+      <g opacity="${eyes}"><ellipse cx="84" cy="78" rx="10" ry="${ey}" fill="#e2c64b"/><ellipse cx="116" cy="78" rx="10" ry="${ey}" fill="#e2c64b"/>
+      ${o.blink ? "" : `<ellipse cx="${84 + lk}" cy="78" rx="2.4" ry="8" fill="#0a0a0a"/><ellipse cx="${116 + lk}" cy="78" rx="2.4" ry="8" fill="#0a0a0a"/>`}</g>
       <path d="M95 92 l5 4 l5 -4Z" fill="#5c4048"/>
       <path d="M60 196 q8 -14 16 0 M124 196 q8 -14 16 0" fill="#111317"/>
     </g>`;
@@ -175,15 +175,16 @@
       <path d="M90 14 L148 12 Q178 14 192 36 L72 36Z" fill="#1d2a33"/><path d="M134 13 v23" stroke="${color}" stroke-width="6"/>
       ${hazard ? `<rect x="244" y="54" width="12" height="10" rx="3" fill="#e0913a" class="hazard"/><rect x="0" y="54" width="10" height="10" rx="3" fill="#e0913a" class="hazard"/>` : ''}</g>`;
   }
-  function water(y0, seed = 3) {
+  function water(y0, seed = 3, t = 0) {
     const r = rng(seed); let lines = '';
     for (let i = 0; i < 26; i++) { const y = y0 + 20 + i * ((1920 - y0) / 26), x = r() * 900, w = 60 + r() * 180; lines += `M${x.toFixed(0)} ${y.toFixed(0)} q${w / 2} -8 ${w} 0 `; }
     return `<defs><linearGradient id="wg${seed}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.water}"/><stop offset="1" stop-color="${P.waterDeep}"/></linearGradient></defs>
       <rect x="0" y="${y0}" width="1080" height="${1920 - y0}" fill="url(#wg${seed})"/>
-      <path class="waves" d="${lines}" fill="none" stroke="${P.waterLine}" stroke-width="3" opacity=".55"/>`;
+      <path class="waves" transform="translate(${Math.sin(t * .9) * 30} 0)" d="${lines}" fill="none" stroke="${P.waterLine}" stroke-width="3" opacity=".55"/>`;
   }
 
-  function bgFlood() {
+  function bgFlood(o = {}) {
+    const dx = (o.t || 0) * 14;
     const r = rng(7); let bld = '', win = '';
     const xs = [[0, 250, 520], [250, 230, 640], [480, 300, 480], [780, 300, 600]];
     xs.forEach(([x, w, h]) => { bld += `<rect x="${x}" y="${1180 - h}" width="${w}" height="${h}" fill="#111922"/>`;
@@ -192,12 +193,12 @@
     return `<g class="bg-flood">
       <defs><linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070b11"/><stop offset="1" stop-color="#1c2a37"/></linearGradient></defs>
       <rect width="1080" height="1920" fill="url(#sky1)"/>${bld}${win}
-      ${water(1130, 3)}
-      <g transform="translate(130 1250) rotate(-4)">${car('#2f3842', true)}</g>
-      <g transform="translate(560 1360) rotate(5) scale(1.6)">${car('#4a3b3b', true)}</g>
-      <g class="cat-on-car" transform="translate(720 1215) scale(.62)">${cat()}</g>
+      ${water(1130, 3, o.t)}
+      <g transform="translate(${130 + dx * .6} ${1250 + Math.sin((o.t || 0) * 1.3) * 6}) rotate(-4)">${car('#2f3842', true)}</g>
+      <g transform="translate(${dx} ${Math.sin((o.t || 0) * 1.1) * 8})"><g transform="translate(560 1360) rotate(5) scale(1.6)">${car('#4a3b3b', (o.t * 2 | 0) % 2 === 0)}</g>
+      <g class="cat-on-car" transform="translate(720 1215) scale(.62)">${cat(o.cat || {})}</g></g>
       <rect x="560" y="1500" width="420" height="40" fill="${P.water}" opacity=".85"/>
-      ${rain(11, 160)}
+      ${o.noRain ? '' : rain(11, 160)}
       <path fill-rule="evenodd" d="M0 0 H1080 V1920 H0Z M90 170 H990 V1480 H90Z" fill="#17120f"/>
       <rect x="528" y="170" width="24" height="1310" fill="#17120f"/><rect x="90" y="800" width="900" height="22" fill="#17120f"/>
       <rect x="60" y="1480" width="960" height="40" fill="#241b16"/>
@@ -236,13 +237,13 @@
       <g transform="translate(${VX0 + 75} ${VY0 + 270}) scale(.5)">${clock()}</g>
       ${doorL(30, 170, 41)}${doorL(240, 330, 43)}
       ${doorR(910, 1060, '<tspan fill="#e6c88a">42</tspan>')}${doorR(740, 830, 44)}
-      <path class="crack" d="M120 420 l40 60 l-20 40 l50 70 l-10 50 l40 60" fill="none" stroke="#0a0d11" stroke-width="6" stroke-linejoin="bevel" opacity="${o.crack ?? 1}"/>
+      <path class="crack" d="M120 420 l40 60 l-20 40 l50 70 l-10 50 l40 60" fill="none" stroke="#0a0d11" stroke-width="6" stroke-linejoin="bevel" opacity="${o.crack ?? 1}" stroke-dasharray="700" stroke-dashoffset="${700 * (1 - (o.crack ?? 1))}"/>
       <defs><radialGradient id="lampg"><stop offset="0" stop-color="${P.lamp}" stop-opacity=".45"/><stop offset="1" stop-color="${P.lamp}" stop-opacity="0"/></radialGradient></defs>
-      <g class="lamp"><circle cx="540" cy="470" r="420" fill="url(#lampg)"/><rect x="470" y="420" width="140" height="22" rx="8" fill="${P.lampSoft}"/></g>
+      <g class="lamp" opacity="${o.lamp ?? 1}"><circle cx="540" cy="470" r="420" fill="url(#lampg)"/><rect x="470" y="420" width="140" height="22" rx="8" fill="${P.lampSoft}"/></g>
     </g>`;
   }
 
-  function bgBasement() {
+  function bgBasement(o = {}) {
     let stairs = '';
     for (let i = 0; i < 8; i++) stairs += `<rect x="${0}" y="${780 + i * 90}" width="${300 - i * 22}" height="90" fill="${i % 2 ? '#22272d' : '#262b31'}"/><rect x="0" y="${780 + i * 90}" width="${300 - i * 22}" height="10" fill="#30363d"/>`;
     let rivets = '';
@@ -261,7 +262,7 @@
       <g class="digits" transform="rotate(-3 540 420)"><text x="540" y="470" text-anchor="middle" font-family="DejaVu Serif" font-size="190" letter-spacing="40" fill="none" stroke="#b7c0c6" stroke-width="6" opacity=".8">4 1 9 7</text>
         <path d="M250 520 L830 500" stroke="#b7c0c6" stroke-width="4" opacity=".5"/><path d="M880 330 v80 M900 330 v80 M920 330 v80 M940 330 v80 M870 390 L960 350" stroke="#8b949a" stroke-width="5" opacity=".6"/></g>
       ${stairs}
-      ${water(1520, 5)}
+      ${water(1520, 5, o.t)}
       <defs><radialGradient id="flash"><stop offset="0" stop-color="${P.lampSoft}" stop-opacity=".22"/><stop offset="1" stop-color="${P.lampSoft}" stop-opacity="0"/></radialGradient></defs>
       <circle class="flashlight" cx="560" cy="1060" r="520" fill="url(#flash)"/>
     </g>`;
@@ -290,22 +291,22 @@
     const r = rng(21); let sky = '', win = '';
     let x = 0;
     while (x < 1080) { const w = 70 + r() * 120, h = 260 + r() * 520; sky += `<rect x="${x.toFixed(0)}" y="${(1100 - h).toFixed(0)}" width="${w.toFixed(0)}" height="${h.toFixed(0)}" fill="#0e1520"/>`;
-      for (let yy = 1100 - h + 24; yy < 1080; yy += 34) for (let xx = x + 12; xx < x + w - 16; xx += 24) if (r() < .55) win += `<rect class="cw" x="${xx.toFixed(0)}" y="${yy.toFixed(0)}" width="12" height="16" fill="${r() < .7 ? P.lamp : P.lampSoft}" opacity="${(o.lit ?? 1) * (.6 + r() * .4)}"/>`;
+      for (let yy = 1100 - h + 24; yy < 1080; yy += 34) for (let xx = x + 12; xx < x + w - 16; xx += 24) if (r() < .55) { const on = xx < (o.lightX ?? 2000) - r() * 80; const c = r() < .7 ? P.lamp : P.lampSoft, op = .6 + r() * .4; win += `<rect class="cw" x="${xx.toFixed(0)}" y="${yy.toFixed(0)}" width="12" height="16" fill="${on ? c : '#1a2330'}" opacity="${on ? op : 1}"/>`; }
       x += w + 6; }
     return `<g class="bg-city">
       <defs><linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05080d"/><stop offset=".7" stop-color="#16202e"/><stop offset="1" stop-color="#2a2a30"/></linearGradient></defs>
       <rect width="1080" height="1920" fill="url(#sky2)"/>
       <path d="M0 260 q200 -60 420 -10 q240 50 660 -20 V0 H0Z" fill="#0b1119" opacity=".9"/>
       ${sky}${win}
-      ${water(1100, 9)}
+      ${water(1100, 9, o.t)}
       <g opacity=".25" transform="translate(0 2200) scale(1 -1)">${win}</g>
       <g class="our-house" transform="rotate(-7 640 1700)">
         <rect x="420" y="760" width="440" height="1200" fill="#06090d"/>
         ${Array.from({ length: 14 }, (_, i) => Array.from({ length: 5 }, (_, j) => `<rect x="${450 + j * 80}" y="${800 + i * 80}" width="40" height="50" fill="#0f141a"/>`).join('')).join('')}
         <rect x="420" y="740" width="440" height="24" fill="#0a0e13"/>
       </g>
-      ${water(1640, 10)}
-      ${rain(31, 120, .25)}
+      ${water(1640, 10, o.t)}
+      ${o.noRain ? '' : rain(31, 120, .25)}
     </g>`;
   }
 
