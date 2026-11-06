@@ -9,7 +9,7 @@ const FPS=30,mode=process.argv[2];
   const p=await b.newPage({viewport:{width:1080,height:1920}});await p.goto('file://'+process.cwd()+'/_scene.html');
   fs.mkdirSync('stills',{recursive:true});
   const S=data.sent.map(a=>a[1]);
-  const ts=[1.0,S[1]+1.2,S[3]+1.6,S[4]+1.4,S[5]+1.0,S[7]+1.2,S[9]+1.0];
+  const ts=[S[0]+1.5,S[1]+1.5,S[3]+1.0,S[5]+2.2,S[7]+1.4,S[11]+1.2,S[13]+1.0];
   for(const [i,t] of ts.entries()){await p.evaluate(t=>draw(t),t);await p.screenshot({path:`stills/f${i}.png`});}
  }else{
   const N=Math.ceil((data.total+0.8)*FPS),W=4;fs.mkdirSync('frames',{recursive:true});

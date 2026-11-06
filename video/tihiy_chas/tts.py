@@ -1,16 +1,18 @@
 import ssl,asyncio,json,subprocess,edge_tts,edge_tts.communicate as ec
 ec._SSL_CTX=ssl.create_default_context(cafile="/root/.ccr/ca-bundle.crt")
-VOICE="ru-RU-SvetlanaNeural";RATE="+22%"
-S=["Пять тысяч рублей.","Условие простое. Час без телефона.",
-"Таймер пошёл.","Сообщения летят.",
-"И вдруг. Мама. Позвони срочно.","Осталось сорок минут.",
+VOICE="ru-RU-DmitryNeural";RATE="+28%";PITCH="-4Hz"
+S=["Ты на мели. До зарплаты три дня.","Незнакомец даёт тебе пять тысяч рублей.",
+"Условие простое. Час не трогай телефон.","Экран заблокирован.",
+"Таймер пошёл.","Сообщения летят. Лена. Банк. Работа. Курьер.",
+"Тебе нужны эти деньги.","И вдруг. Мама. Позвони срочно.",
+"Она никогда так не писала.","Осталось сорок минут.",
 "Первое. Забрать пять тысяч.","Второе. Позвонить маме.",
 "Что бы ты сделал?","Один или два?"]
 async def one(s):
     for a in range(60):
         try:
             au=b"";w=[]
-            async for x in edge_tts.Communicate(s,VOICE,rate=RATE,boundary="WordBoundary").stream():
+            async for x in edge_tts.Communicate(s,VOICE,rate=RATE,pitch=PITCH,boundary="WordBoundary").stream():
                 if x["type"]=="audio": au+=x["data"]
                 elif x["type"]=="WordBoundary": w.append((x["offset"]/1e7,x["duration"]/1e7,x["text"]))
             if au: return au,w
@@ -29,7 +31,7 @@ async def m():
         subprocess.run(["ffmpeg","-y","-v","error","-i",f"s{i}.mp3","-ar","44100","-ac","1",f"s{i}.wav"],check=True)
         d=float(subprocess.check_output(["ffprobe","-v","error","-show_entries","format=duration","-of","csv=p=0",f"s{i}.wav"]))
         for o,du,tx in w: words.append({"t":t0+o,"d":du,"w":tx,"s":i})
-        lst.append((i,t0,d)); t0+=d+(0.12 if i not in (1,3,7) else 0.2)
+        lst.append((i,t0,d)); t0+=d+(0.18 if i not in (4,) else 0.1)
     # concat with gaps
     fl=[];cx=[]
     for i,st,d in lst:
