@@ -5,11 +5,11 @@ const [, , words, out, fpsA, wA] = process.argv; const fps = +fpsA || 30, W = +w
 fs.mkdirSync(out, { recursive: true });
 (async () => {
   const b = await chromium.launch(); const raw = JSON.parse(fs.readFileSync(words));
-  const p0 = await b.newPage(); await p0.goto('file://' + path.resolve(__dirname, 'animate.html')); const dur = await p0.evaluate(w => { setup(w); return DURATION; }, raw); await p0.close();
+  const p0 = await b.newPage(); await p0.goto('file://' + path.resolve(__dirname, process.env.ANIM || 'animate.html')); const dur = await p0.evaluate(w => { setup(w); return DURATION; }, raw); await p0.close();
   const N = Math.round(dur * fps), per = Math.ceil(N / W); const t0 = Date.now();
   await Promise.all([...Array(W)].map(async (_, k) => {
     const p = await b.newPage({ viewport: { width: 1080, height: 1920 } }); p.on('pageerror', e => console.log('ERR', e.message));
-    await p.goto('file://' + path.resolve(__dirname, 'animate.html')); await p.evaluate(w => setup(w), raw);
+    await p.goto('file://' + path.resolve(__dirname, process.env.ANIM || 'animate.html')); await p.evaluate(w => setup(w), raw);
     const ff = spawn('ffmpeg', ['-loglevel', 'error', '-y', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', '-', '-c:v', 'libx264', '-preset', 'medium', '-crf', '17', '-pix_fmt', 'yuv420p', `${out}/seg${k}.mp4`]);
     for (let i = k * per; i < Math.min(N, (k + 1) * per); i++) {
       await p.evaluate(t => render(t), i / fps);
