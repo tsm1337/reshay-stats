@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Решай сам — оформление</title>
+<style>html,body{margin:0;background:#000}svg{display:block}</style></head>
+<body><div id="stage"></div>
+<script src="../art/assets.js"></script>
+<script>
+const A = POTOP, P = A.P;
+const DEFS = `<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#04070b"/><stop offset=".6" stop-color="#14202d"/><stop offset="1" stop-color="#2a2a30"/></linearGradient>
+  <linearGradient id="wat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12303b"/><stop offset="1" stop-color="#050f14"/></linearGradient>
+  <radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".8"/></radialGradient>
+  <radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#e8c76a" stop-opacity=".5"/><stop offset="1" stop-color="#e8c76a" stop-opacity="0"/></radialGradient>
+  <filter id="b8"><feGaussianBlur stdDeviation="8"/></filter></defs>`;
+
+function skyline(x0, x1, base, seed, hMin, hMax, lit, col = '#0e1520') {
+  const r = A.rng(seed); let b = '', w = '', x = x0;
+  while (x < x1) {
+    const bw = 70 + r() * 130, h = hMin + r() * (hMax - hMin);
+    b += `<rect x="${x.toFixed(0)}" y="${(base - h).toFixed(0)}" width="${bw.toFixed(0)}" height="${h.toFixed(0)}" fill="${col}"/>`;
+    for (let yy = base - h + 22; yy < base - 20; yy += 34) for (let xx = x + 12; xx < x + bw - 16; xx += 24)
+      if (r() < lit) w += `<rect x="${xx.toFixed(0)}" y="${yy.toFixed(0)}" width="12" height="16" fill="${r() < .75 ? P.lamp : P.lampSoft}" opacity="${(.55 + r() * .45).toFixed(2)}"/>`;
+    x += bw + 5;
+  }
+  return b + w;
+}
+function ourHouse(x, base, w, h, rot) {  // наш тёмный накренённый дом, одно окошко горит
+  let win = '';
+  for (let i = 0; i < Math.floor(h / 80); i++) for (let j = 0; j < Math.floor(w / 80); j++)
+    win += `<rect x="${x + 22 + j * 80}" y="${base - h + 40 + i * 80}" width="40" height="50" fill="${i === 3 && j === 1 ? '#ffcf6a' : '#0e141b'}"/>`;
+  return `<g transform="rotate(${rot} ${x + w / 2} ${base})"><rect x="${x}" y="${base - h}" width="${w}" height="${h + 400}" fill="#05080c"/>${win}
+    <rect x="${x - 6}" y="${base - h - 16}" width="${w + 12}" height="18" fill="#0a0e13"/></g>`;
+}
+function waves(x0, x1, y0, y1, seed) {
+  const r = A.rng(seed); let l = '';
+  for (let i = 0; i < 40; i++) { const y = y0 + 12 + i * ((y1 - y0) / 40), x = x0 + r() * (x1 - x0 - 200), w = 80 + r() * 260; l += `M${x.toFixed(0)} ${y.toFixed(0)} q${w / 2} -10 ${w} 0 `; }
+  return `<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" fill="url(#wat)"/><path d="${l}" fill="none" stroke="${P.waterLine}" stroke-width="3" opacity=".5"/>`;
+}
+function rainLines(W, H, seed, n, op) {
+  const r = A.rng(seed); let s = '';
+  for (let i = 0; i < n; i++) { const x = r() * (W + 100) - 50, y = r() * H, l = 40 + r() * 80; s += `M${x.toFixed(0)} ${y.toFixed(0)} l${(-l * .18).toFixed(0)} ${l.toFixed(0)} `; }
+  return `<path d="${s}" stroke="#7f9db0" stroke-width="2.4" opacity="${op}" stroke-linecap="round"/>`;
+}
+const person = (svg, x, y, s, flip) => `<g transform="translate(${x} ${y}) scale(${flip ? -s : s} ${s}) translate(-100 -392)">${svg}</g>`;
+
+// ---- Аватарка 800×800 (в круге: всё важное в радиусе ~340 от центра) ----
+function avatar() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">${DEFS}
+    <rect width="800" height="800" fill="url(#sky)"/>
+    <g transform="translate(-60 0)">${skyline(0, 920, 560, 7, 160, 330, .5)}</g>
+    <circle cx="560" cy="170" r="80" fill="url(#glow)" opacity=".5"/>
+    <g transform="translate(60 -20)">${ourHouse(250, 600, 290, 470, -9)}</g>
+    ${waves(0, 800, 560, 800, 5)}
+    <g opacity=".22" transform="translate(-60 1120) scale(1 -1)">${skyline(0, 920, 560, 7, 160, 330, .5)}</g>
+    <g transform="translate(205 585) rotate(-8)"><path d="M0 0 Q70 30 140 0 L120 34 Q70 48 20 34Z" fill="#4a3426"/><path d="M0 0 Q70 30 140 0 L136 8 Q70 38 4 8Z" fill="#6a4a34"/></g>
+    <path d="M560 360 l-4 90 l22 -4Z" fill="none"/>
+    <path d="M40 640 q40 -10 80 0 M600 700 q60 -12 120 0 M180 740 q90 -12 180 0" stroke="${P.waterLine}" stroke-width="4" fill="none" opacity=".5"/>
+    ${rainLines(800, 800, 3, 70, .3)}
+    <rect width="800" height="800" fill="url(#vig)"/>
+  </svg>`;
+}
+
+// ---- Баннер YouTube 2560×1440, безопасная зона 1546×423 по центру (507..2053 × 508..931) ----
+function banner() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="1440" viewBox="0 0 2560 1440">${DEFS}
+    <rect width="2560" height="1440" fill="url(#sky)"/>
+    ${skyline(0, 2560, 1000, 11, 220, 620, .5)}
+    <circle cx="2090" cy="330" r="150" fill="url(#glow)" opacity=".5"/>
+    ${ourHouse(2020, 1060, 360, 640, -7)}
+    ${waves(0, 2560, 1000, 1440, 9)}
+    <g opacity=".2" transform="translate(0 2000) scale(1 -1)">${skyline(0, 2560, 1000, 11, 220, 620, .5)}</g>
+    <g transform="translate(1820 1060) rotate(-7)"><path d="M0 0 Q120 40 240 0 L205 58 Q120 80 36 58Z" fill="#4a3426"/><path d="M0 0 Q120 40 240 0 L233 14 Q120 56 7 14Z" fill="#6a4a34"/></g>
+    ${person(A.ilya(), 190, 1230, 1.6)}
+    ${person(A.vera({ beam: false }), 400, 1235, 1.5)}
+    ${rainLines(2560, 1440, 4, 260, .3)}
+    <rect width="2560" height="1440" fill="url(#vig)"/>
+    <rect x="520" y="450" width="1520" height="540" fill="#04070b" opacity=".62" filter="url(#b8)"/>
+    <text x="1280" y="715" text-anchor="middle" font-family="Inter" font-weight="900" font-size="205" letter-spacing="10" fill="#e6e1d3" stroke="#04070b" stroke-width="10" paint-order="stroke">РЕШАЙ САМ</text>
+    <rect x="1000" y="765" width="560" height="6" fill="#d0473b"/>
+    <text x="1280" y="865" text-anchor="middle" font-family="Inter" font-weight="800" font-size="60" letter-spacing="10" fill="#f2cf63" stroke="#04070b" stroke-width="8" paint-order="stroke">МУЛЬТСЕРИАЛ  ·  ПОТОП</text>
+  </svg>`;
+}
+const mode = new URLSearchParams(location.search).get('m') || 'avatar';
+document.getElementById('stage').innerHTML = mode === 'banner' ? banner() : avatar();
+</script></body></html>
