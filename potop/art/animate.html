@@ -81,10 +81,10 @@ sc(0, 5.6, t => { // 1. окно: под окном море
 });
 sc(5.6, 7.9, t => { // 2. мимо плыли машины
   const z = lerp(1.3, 1.5, E(t, 5.6, 7.9));
-  return { w: `<g transform="${cam(z, lerp(420, 640, E(t, 5.6, 7.9)), 1300, 0)}">${A.bgFlood({ t, noRain: true })}</g>${rainOverlay(t, .45)}` };
+  return { w: `<g transform="${cam(z, lerp(460, 640, E(t, 5.6, 7.9)), 1260, 0)}">${A.bgFlood({ t, noRain: true })}</g>${rainOverlay(t, .45)}` };
 });
 sc(7.9, 13.25, t => { // 3. кот смотрит прямо на меня
-  const dx = t * 14, cx = 782 + dx, cy = 1262 + Math.sin(t * 1.1) * 8;
+  const dx = t * 6, cx = 690 + dx, cy = 1190 + Math.sin(t * 1.1) * 8;
   const z = lerp(2.4, 3.4, E(t, 7.9, 13.2));
   const look = t < 10.5 ? -6 : lerp(-6, 0, E(t, 10.5, 10.9));
   const glow = E(t, 10.6, 11.2);
@@ -100,11 +100,11 @@ sc(13.25, 16.35, t => { // 4. последний поезд
 });
 sc(16.35, 22.6, t => { // 5. никто не знал, что я болен
   const z = lerp(1.0, 1.25, E(t, 16.3, 22.5));
-  const pl = E(t, 20.3, 20.8), gl = Math.max(0, 1 - Math.abs(t - 18.2) * 2.2);
+  const gl = Math.max(0, 1 - Math.abs(t - 18.2) * 2.2);
   return { w: `<g transform="${cam(1.7 * z, 540, 1000)}">${A.bgCorridor({ lamp: lampFlicker(t + 4) })}
       ${put(A.ilya({ blink: blinkAt(t, 3.1) }), 540, 1720, 2.05 * breathe(t))}
       <g opacity="${gl}" transform="translate(${540 + (112 - 100) * 2.05} ${1720 + (228 - 392) * 2.05})"><path d="M0 -26 L5 -5 L26 0 L5 5 L0 26 L-5 5 L-26 0 L-5 -5Z" fill="#fff3c0"/></g></g>
-    <g transform="translate(${lerp(-300, 140, pl)} 1200) rotate(${lerp(-30, -8, pl)}) scale(2.2)">${A.pills()}</g>${dust(t)}` };
+    ${dust(t)}` };
 });
 sc(22.6, 27.65, t => { // 6. Вера; вспышка-воспоминание о поезде
   const v = E(t, 22.6, 23.5);

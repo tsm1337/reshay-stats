@@ -137,7 +137,7 @@
   function phone() {
     return `<g><rect x="0" y="0" width="150" height="290" rx="22" fill="#0e1114" stroke="#333a41" stroke-width="5"/>
       <rect x="10" y="22" width="130" height="246" rx="10" fill="#18232c"/>
-      <text x="75" y="70" text-anchor="middle" font-family="Inter" font-weight="700" font-size="15" fill="#9fb2bf">ПОСЛЕДНИЙ ПОЕЗД</text>
+      <text x="75" y="56" text-anchor="middle" font-family="Inter" font-weight="700" font-size="14" fill="#9fb2bf">ПОСЛЕДНИЙ</text><text x="75" y="74" text-anchor="middle" font-family="Inter" font-weight="700" font-size="14" fill="#9fb2bf">ПОЕЗД</text>
       <text x="75" y="125" text-anchor="middle" font-family="Inter" font-weight="800" font-size="44" fill="${P.lamp}">23:40</text>
       <rect x="22" y="150" width="106" height="8" rx="4" fill="#2c3a45"/><rect x="22" y="150" width="70" height="8" rx="4" fill="${P.red}"/>
       <text x="75" y="196" text-anchor="middle" font-family="Inter" font-size="14" fill="#7d8e9a">Вокзал · путь 3</text>
@@ -184,7 +184,7 @@
   }
 
   function bgFlood(o = {}) {
-    const dx = (o.t || 0) * 14;
+    const dx = (o.t || 0) * 6;
     const r = rng(7); let bld = '', win = '';
     const xs = [[0, 250, 520], [250, 230, 640], [480, 300, 480], [780, 300, 600]];
     xs.forEach(([x, w, h]) => { bld += `<rect x="${x}" y="${1180 - h}" width="${w}" height="${h}" fill="#111922"/>`;
@@ -194,10 +194,10 @@
       <defs><linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070b11"/><stop offset="1" stop-color="#1c2a37"/></linearGradient></defs>
       <rect width="1080" height="1920" fill="url(#sky1)"/>${bld}${win}
       ${water(1130, 3, o.t)}
-      <g transform="translate(${130 + dx * .6} ${1250 + Math.sin((o.t || 0) * 1.3) * 6}) rotate(-4)">${car('#2f3842', true)}</g>
-      <g transform="translate(${dx} ${Math.sin((o.t || 0) * 1.1) * 8})"><g transform="translate(560 1360) rotate(5) scale(1.6)">${car('#4a3b3b', (o.t * 2 | 0) % 2 === 0)}</g>
-      <g class="cat-on-car" transform="translate(720 1215) scale(.62)">${cat(o.cat || {})}</g></g>
-      <rect x="560" y="1500" width="420" height="40" fill="${P.water}" opacity=".85"/>
+      <g transform="translate(${150 + dx * .6} ${1185 + Math.sin((o.t || 0) * 1.3) * 5}) rotate(-4) scale(.8)">${car('#2f3842', true)}</g>
+      <g transform="translate(${dx} ${Math.sin((o.t || 0) * 1.1) * 8})"><g transform="translate(470 1250) rotate(3) scale(1.6)">${car('#4a3b3b', (o.t * 2 | 0) % 2 === 0)}</g>
+      <g class="cat-on-car" transform="translate(628 1142) scale(.62)">${cat(o.cat || {})}</g></g>
+      
       ${o.noRain ? '' : rain(11, 160)}
       <path fill-rule="evenodd" d="M0 0 H1080 V1920 H0Z M90 170 H990 V1480 H90Z" fill="#17120f"/>
       <rect x="528" y="170" width="24" height="1310" fill="#17120f"/><rect x="90" y="800" width="900" height="22" fill="#17120f"/>
