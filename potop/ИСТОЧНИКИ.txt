@@ -1,0 +1,43 @@
+ПОТОП — источники звука и музыки
+=================================
+
+Все звуки и музыка — лицензия CC0 1.0 (Public Domain Dedication):
+https://creativecommons.org/publicdomain/zero/1.0/
+Можно использовать в коммерческих роликах, указывать авторство не обязательно
+(указываем из уважения). Лицензия проверена на странице каждого файла 06.11.2026.
+
+Источник: OpenGameArt.org (Freesound.org из облачной среды отвечал 403, поэтому
+взяты CC0-файлы с OpenGameArt). Копии лежат в potop/sound/ (перекодированы в OGG).
+
+ФОН (музыкальная подложка)
+- drone2.ogg — «Drone2», автор tozan
+  https://opengameart.org/content/drone2
+
+ЭФФЕКТЫ
+- amb_rain_loop_1.ogg — «AMB Rain Loop 1», автор kresiek-the-furry (дождь)
+  https://opengameart.org/content/amb-rain-loop-1
+- rain-thunder.ogg — «Rain + Long Thunder», автор wuxiascrub (гром, фрагмент 21–28.5 с)
+  https://opengameart.org/content/rain-long-thunder
+- wind_woosh_loop.ogg — «wind whoosh loop», автор sketchman3 (ветер)
+  https://opengameart.org/content/wind-whoosh-loop
+- tree_creak.ogg — «Tree Creaking», автор antumdeluge (скрип дома, замедлен)
+  https://opengameart.org/content/tree-creaking
+- bfh1_rock_breaking_01.ogg, bfh1_wood_breaking_01.ogg, bfh1_metal_hit_01.ogg —
+  «75 CC0 breaking / falling / hit sfx», автор rubberduck (треск, удар)
+  https://opengameart.org/content/75-cc0-breaking-falling-hit-sfx
+- metal_steps.ogg — «Metal footsteps on concrete», автор thimras (шаги на лестнице)
+  https://opengameart.org/content/metal-footsteps-on-concrete
+- water_splashes.ogg — «6 Short water splashes», автор ezwa (всплески)
+  https://opengameart.org/content/6-short-water-splashes
+- heartbeat_slow.ogg — «Heartbeat sounds», автор bart (сердцебиение)
+  https://opengameart.org/content/heartbeat-sounds
+
+ГОЛОС
+- Рассказчик: ElevenLabs, голос «Liam», модель eleven_v3 — синтез по нашему тексту
+  с аккаунта владельца канала. Если тариф ElevenLabs бесплатный: в описании ролика
+  указать «Озвучка: ElevenLabs (elevenlabs.io)», монетизация на бесплатном тарифе
+  не разрешена — для монетизации нужен платный тариф (Starter и выше).
+
+ГРАФИКА
+- Вся графика и анимация нарисованы кодом (SVG) для сериала, чужих изображений нет.
+  Шрифты: Inter (SIL OFL), DejaVu Serif (свободная лицензия), JetBrains Mono (SIL OFL).

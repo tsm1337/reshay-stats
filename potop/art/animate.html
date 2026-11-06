@@ -175,7 +175,7 @@ sc(54.4, 56.65, t => { // 14. а нас было десять
       <rect width="1080" height="1920" fill="url(#flashC)"/>${ppl}</g>` };
 });
 sc(56.65, 60.75, t => { // 15. тишина, слышно сердце
-  const beat = Math.pow(Math.max(0, Math.sin(t * Math.PI * 2 * 1.15)), 8), z = 3.6 * (1 + beat * .025) * lerp(1, 1.12, E(t, 56.6, 60.7));
+  const bt = ((t - 56.74) % 0.9 + 0.9) % 0.9, beat = t < 56.74 ? 0 : Math.max(Math.exp(-Math.pow(bt / .07, 2)), .7 * Math.exp(-Math.pow((bt - .3) / .07, 2))), z = 3.6 * (1 + beat * .025) * lerp(1, 1.12, E(t, 56.6, 60.7));
   return { w: `<g transform="${cam(z, 540, 1720 - 300 * 2.05 + 20, TILT(t))}">${A.bgCorridor({ lamp: .35 })}${put(A.ilya({ blink: blinkAt(t, 2.9) }), 540, 1720, 2.05)}</g>
       <rect width="1080" height="1920" fill="#6b0f0f" opacity="${beat * .22}"/>`, vig: 1 };
 });
