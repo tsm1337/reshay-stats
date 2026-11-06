@@ -17,7 +17,33 @@
 
   // ---------- ПЕРСОНАЖИ (viewBox 0 0 200 400, ступни на y≈390) ----------
   function ilya(o = {}) {
-    const blink = o.blink ? 1 : 5;
+    const blink = o.blink ? 1 : 5, back = !!o.back;
+    const front = back ? '' : `
+      <path d="M80 150 L100 196 L120 150" fill="none" stroke="#2f3c43" stroke-width="5"/>
+      <rect x="72" y="226" width="56" height="30" rx="11" fill="#34434a"/>
+      <path d="M93 152 C 90 190, 106 205, 110 232" fill="none" stroke="${P.brass}" stroke-width="2"/>
+      <rect x="104" y="224" width="16" height="9" rx="3" fill="${P.brass}"/><circle cx="117" cy="228" r="2.5" fill="#6d5520"/>`;
+    const head = back ? `
+      <rect x="86" y="120" width="28" height="34" rx="8" fill="${P.skinSh}"/>
+      <circle cx="62" cy="100" r="9" fill="${P.skinSh}"/><circle cx="138" cy="100" r="9" fill="${P.skinSh}"/>
+      <ellipse cx="100" cy="92" rx="42" ry="47" fill="${P.hair}"/>
+      <path d="M70 118 Q100 134 130 118 Q124 130 100 134 Q76 130 70 118Z" fill="#14121a"/>
+      <path d="M60 94 Q62 34 100 32 Q138 34 140 94" fill="none" stroke="#1b1f24" stroke-width="9" stroke-linecap="round"/>
+      <rect x="52" y="86" width="20" height="30" rx="9" fill="#1b1f24"/><rect x="128" y="86" width="20" height="30" rx="9" fill="#1b1f24"/>
+      <circle cx="62" cy="101" r="3" fill="${P.cyan}"/>` : `
+      <rect x="88" y="128" width="24" height="22" fill="${P.skinSh}"/>
+      <path d="M66 150 Q100 176 134 150" fill="none" stroke="#15181c" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="68" cy="148" r="13" fill="#1b1f24"/><circle cx="132" cy="148" r="13" fill="#1b1f24"/>
+      <circle cx="132" cy="148" r="3" fill="${P.cyan}"/>
+      <ellipse cx="100" cy="92" rx="40" ry="46" fill="${P.skin}"/>
+      <path d="M124 60 Q144 92 124 128 Q138 92 124 60Z" fill="${P.skinSh}" opacity=".7"/>
+      <path d="M59 92 C56 50 76 40 100 40 C124 40 144 50 141 92 C137 76 124 68 100 68 C76 68 63 76 59 92Z" fill="${P.hair}"/>
+      <path d="M76 88 L94 82 M124 88 L106 82" stroke="${P.hair}" stroke-width="3.5" stroke-linecap="round"/>
+      <ellipse cx="86" cy="98" rx="4.2" ry="${blink}" fill="${P.ink}"/><ellipse cx="114" cy="98" rx="4.2" ry="${blink}" fill="${P.ink}"/>
+      <circle cx="87.5" cy="96" r="1.3" fill="#fff"/><circle cx="115.5" cy="96" r="1.3" fill="#fff"/>
+      <path d="M79 107 Q86 111 93 107 M107 107 Q114 111 121 107" fill="none" stroke="#9c8373" stroke-width="2"/>
+      <path d="M93 122 Q100 119 107 122" fill="none" stroke="#7a5f55" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M134 86 q4 8 0 11 q-4 -3 0 -11Z" fill="#9fd0dd"/>`;
     return `<g class="ilya">
       <ellipse cx="100" cy="392" rx="58" ry="8" fill="#000" opacity=".35"/>
       <rect x="70" y="262" width="27" height="118" rx="9" fill="#27303d"/>
@@ -26,26 +52,8 @@
       <rect x="101" y="372" width="38" height="16" rx="7" fill="#737a83"/><rect x="101" y="383" width="38" height="5" rx="2" fill="#a7adb3"/>
       <g id="ilya-armL"><rect x="36" y="156" width="25" height="112" rx="12" fill="#34434a" transform="rotate(6 48 160)"/><circle cx="41" cy="270" r="11" fill="${P.skin}"/></g>
       <g id="ilya-armR"><rect x="139" y="156" width="25" height="112" rx="12" fill="#34434a" transform="rotate(-6 152 160)"/><circle cx="159" cy="270" r="11" fill="${P.skin}"/></g>
-      <rect x="54" y="146" width="92" height="136" rx="28" fill="#3d4d55"/>
-      <path d="M80 150 L100 196 L120 150" fill="none" stroke="#2f3c43" stroke-width="5"/>
-      <rect x="72" y="226" width="56" height="30" rx="11" fill="#34434a"/>
-      <path d="M93 152 C 90 190, 106 205, 110 232" fill="none" stroke="${P.brass}" stroke-width="2"/>
-      <rect x="104" y="224" width="16" height="9" rx="3" fill="${P.brass}"/><circle cx="117" cy="228" r="2.5" fill="#6d5520"/>
-      <ellipse cx="100" cy="144" rx="44" ry="18" fill="#34434a"/>
-      <rect x="88" y="128" width="24" height="22" fill="${P.skinSh}"/>
-      <path d="M66 150 Q100 176 134 150" fill="none" stroke="#15181c" stroke-width="8" stroke-linecap="round"/>
-      <circle cx="68" cy="148" r="13" fill="#1b1f24"/><circle cx="132" cy="148" r="13" fill="#1b1f24"/>
-      <circle cx="132" cy="148" r="3" fill="${P.cyan}"/>
-      <ellipse cx="100" cy="92" rx="40" ry="46" fill="${P.skin}"/>
-      <path d="M124 60 Q144 92 124 128 Q138 92 124 60Z" fill="${P.skinSh}" opacity=".7"/>
-      <path d="M58 86 Q56 44 98 40 Q138 38 142 80 Q132 62 120 66 Q112 52 100 60 Q88 50 82 64 Q68 62 58 86Z" fill="${P.hair}"/>
-      <path d="M82 64 L76 52 M100 58 L98 44 M118 64 L124 50" stroke="${P.hair}" stroke-width="7" stroke-linecap="round"/>
-      <path d="M76 88 L94 82 M124 88 L106 82" stroke="${P.hair}" stroke-width="3.5" stroke-linecap="round"/>
-      <ellipse cx="86" cy="98" rx="4.2" ry="${blink}" fill="${P.ink}"/><ellipse cx="114" cy="98" rx="4.2" ry="${blink}" fill="${P.ink}"/>
-      <circle cx="87.5" cy="96" r="1.3" fill="#fff"/><circle cx="115.5" cy="96" r="1.3" fill="#fff"/>
-      <path d="M79 107 Q86 111 93 107 M107 107 Q114 111 121 107" fill="none" stroke="#9c8373" stroke-width="2"/>
-      <path d="M93 122 Q100 119 107 122" fill="none" stroke="#7a5f55" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M134 86 q4 8 0 11 q-4 -3 0 -11Z" fill="#9fd0dd"/>
+      <rect x="54" y="146" width="92" height="136" rx="28" fill="${back ? '#38474e' : '#3d4d55'}"/>${front}
+      <ellipse cx="100" cy="144" rx="44" ry="18" fill="#34434a"/>${head}
     </g>`;
   }
 
@@ -145,9 +153,9 @@
   }
   function note(txt = ['НЕ СПУСКАЙТЕСЬ', 'В ПОДВАЛ']) {
     return `<g><path d="M0 4 L180 0 L184 120 L4 126Z" fill="${P.paper}"/><path d="M80 0 h24 v14 h-24Z" fill="#b9b39f" opacity=".8"/>
-      ${txt.map((t, i) => `<text x="92" y="${58 + i * 32}" text-anchor="middle" font-family="DejaVu Serif" font-style="italic" font-size="17" fill="#2b2d33" transform="rotate(-2 92 60)">${t}</text>`).join('')}</g>`;
+      ${txt.map((t, i) => `<text x="92" y="${58 + i * 34}" text-anchor="middle" font-family="DejaVu Serif" font-style="italic" font-weight="700" font-size="22" textLength="${Math.min(150, t.length * 11)}" lengthAdjust="spacingAndGlyphs" fill="#23252b" transform="rotate(-2 92 60)">${t}</text>`).join('')}</g>`;
   }
-  function poster() {
+    function poster() {
     return `<g><rect x="0" y="0" width="220" height="300" fill="${P.paper}"/>
       <text x="110" y="46" text-anchor="middle" font-family="Inter" font-weight="900" font-size="38" fill="${P.red}">ПРОПАЛА</text>
       <rect x="40" y="62" width="140" height="150" fill="#9aa1a8"/>
@@ -207,24 +215,31 @@
   }
 
   function bgCorridor(o = {}) {
-    const VX0 = 400, VX1 = 680, VY0 = 660, VY1 = 1060;
-    const topL = x => VY0 * x / VX0, botL = x => 1920 - (1920 - VY1) * x / VX0;
-    const topR = x => VY0 * (1080 - x) / (1080 - VX1), botR = x => 1920 - (1920 - VY1) * (1080 - x) / (1080 - VX1);
-    const doorL = (x1, x2, n) => { const a = t => topL(t) + (botL(t) - topL(t)) * .22, b = botL;
-      const nx = x1 + (x2 - x1) * .45, ny = a(nx) + (b(nx) - a(nx)) * .25;
-      return `<polygon points="${x1},${a(x1)} ${x2},${a(x2)} ${x2},${b(x2)} ${x1},${b(x1)}" fill="${P.door}"/>
-        <polygon points="${x1 + 6},${a(x1) + 8} ${x2 - 4},${a(x2) + 4} ${x2 - 4},${b(x2) - 4} ${x1 + 6},${b(x1) - 8}" fill="none" stroke="${P.door2}" stroke-width="5"/>
-        <rect x="${nx - 18}" y="${ny - 22}" width="${(x2 - x1) * .38}" height="${(b(nx) - a(nx)) * .14}" fill="${P.paper}" class="note" transform="skewY(${(-(VY0) / VX0 * 26).toFixed(1)})" transform-origin="${nx} ${ny}"/>
-        <text x="${(x1 + x2) / 2}" y="${a((x1 + x2) / 2) + 40}" font-family="Inter" font-weight="700" font-size="${(x2 - x1) * .16}" fill="#c9b79a" text-anchor="middle">${n}</text>`; };
-    const doorR = (x1, x2, n) => { const a = t => topR(t) + (botR(t) - topR(t)) * .22, b = botR;
-      const nx = x1 + (x2 - x1) * .5, ny = a(nx) + (b(nx) - a(nx)) * .28;
-      return `<polygon points="${x1},${a(x1)} ${x2},${a(x2)} ${x2},${b(x2)} ${x1},${b(x1)}" fill="${P.door}"/>
-        <polygon points="${x1 + 4},${a(x1) + 4} ${x2 - 6},${a(x2) + 8} ${x2 - 6},${b(x2) - 8} ${x1 + 4},${b(x1) - 4}" fill="none" stroke="${P.door2}" stroke-width="5"/>
-        <polygon class="note" points="${nx - (x2 - x1) * .18},${ny} ${nx + (x2 - x1) * .18},${ny + (x2 - x1) * .1} ${nx + (x2 - x1) * .18},${ny + (x2 - x1) * .3} ${nx - (x2 - x1) * .18},${ny + (x2 - x1) * .2}" fill="${P.paper}"/>
-        <text x="${(x1 + x2) / 2}" y="${a((x1 + x2) / 2) + 40}" font-family="Inter" font-weight="700" font-size="${(x2 - x1) * .16}" fill="#c9b79a" text-anchor="middle">${n}</text>`; };
+    const dx = o.vx || 0, VX0 = 400 + dx, VX1 = 680 + dx, VY0 = 660, VY1 = 1060, exit = o.end === 'exit';
+    const lt = x => VY0 * x / VX0, lb = x => 1920 - (1920 - VY1) * x / VX0;
+    const rt = x => VY0 * (1080 - x) / (1080 - VX1), rb = x => 1920 - (1920 - VY1) * (1080 - x) / (1080 - VX1);
+    const wall = (side, u1, u2, label, gold) => {
+      const X = u => side === 'L' ? u * VX0 : 1080 - u * (1080 - VX1), top = side === 'L' ? lt : rt, bot = side === 'L' ? lb : rb;
+      const x1 = X(u1), x2 = X(u2), Y = (x, f) => { const a = top(x) + (bot(x) - top(x)) * .22; return a + (bot(x) - a) * f; };
+      const quad = (f1, f2, fa, fb) => `${fa},${Y(fa === x1 ? x1 : x2, f1)} ${fb},${Y(fb === x1 ? x1 : x2, f1)} ${fb},${Y(fb === x1 ? x1 : x2, f2)} ${fa},${Y(fa === x1 ? x1 : x2, f2)}`;
+      const mid = (x1 + x2) / 2, nx1 = x1 + (x2 - x1) * .22, nx2 = x1 + (x2 - x1) * .78;
+      const Q = (xa, xb, f1, f2) => `${xa},${Y(xa, f1)} ${xb},${Y(xb, f1)} ${xb},${Y(xb, f2)} ${xa},${Y(xa, f2)}`;
+      return `<polygon points="${Q(x1, x2, 0, 1)}" fill="${P.door}"/>
+        <polygon points="${Q(x1 + (x2 - x1) * .08, x2 - (x2 - x1) * .08, .05, .93)}" fill="none" stroke="${P.door2}" stroke-width="4"/>
+        ${o.strips ? `<polygon points="${Q(x1, x2, 1, 1.012)}" fill="#f3dc96" opacity=".75"/>` : ''}
+        ${o.notes === false ? '' : `<polygon class="note" points="${Q(nx1, nx2, .3, .5)}" fill="${P.paper}"/><polygon points="${Q(nx1 + (nx2 - nx1) * .12, nx2 - (nx2 - nx1) * .12, .35, .37)}" fill="#8b8f96"/><polygon points="${Q(nx1 + (nx2 - nx1) * .12, nx2 - (nx2 - nx1) * .3, .41, .43)}" fill="#8b8f96"/>`}
+        <text x="${mid}" y="${Y(mid, .12)}" font-family="Inter" font-weight="800" font-size="${Math.max(10, (x2 - x1) * .17)}" fill="${gold ? '#f0cf86' : '#c9b79a'}" text-anchor="middle">${label}</text>`;
+    };
     let tiles = '';
-    for (let i = 1; i < 9; i++) { const t = i / 9, y = VY1 + (1920 - VY1) * t * t; const xl = VX0 * (1 - (y - VY1) / (1920 - VY1)), xr = 1080 - (1080 - VX1) * (1 - (y - VY1) / (1920 - VY1)); tiles += `M${xl} ${y} L${xr} ${y} `; }
-    for (let i = -4; i <= 4; i++) tiles += `M${540 + i * 35} ${VY1} L${540 + i * 260} 1920 `;
+    for (let i = 1; i < 9; i++) { const t = i / 9, y = VY1 + (1920 - VY1) * t * t, k = (y - VY1) / (1920 - VY1); tiles += `M${VX0 * (1 - k)} ${y} L${1080 - (1080 - VX1) * (1 - k)} ${y} `; }
+    for (let i = -4; i <= 4; i++) tiles += `M${(VX0 + VX1) / 2 + i * 35} ${VY1} L${(VX0 + VX1) / 2 + i * 260} 1920 `;
+    const endWall = exit
+      ? `<rect x="${VX0}" y="${VY0}" width="${VX1 - VX0}" height="${VY1 - VY0}" fill="#1c2630"/><rect x="${VX0 + 70}" y="${VY0 + 90}" width="${VX1 - VX0 - 140}" height="${VY1 - VY0 - 90}" fill="#26323c" stroke="#10161c" stroke-width="6"/>
+         <rect x="${(VX0 + VX1) / 2 - 55}" y="${VY0 + 28}" width="110" height="44" rx="6" fill="#0c3a24"/><text x="${(VX0 + VX1) / 2}" y="${VY0 + 62}" text-anchor="middle" font-family="Inter" font-weight="900" font-size="26" fill="#3cff8f">ВЫХОД</text>
+         <rect x="${VX0 + 70}" y="${VY0 + 90}" width="${VX1 - VX0 - 140}" height="${VY1 - VY0 - 90}" fill="#3cff8f" opacity=".07"/>`
+      : `<rect x="${VX0}" y="${VY0}" width="${VX1 - VX0}" height="${VY1 - VY0}" fill="${P.wallEnd}"/>
+         <rect x="${VX0 + 70}" y="${VY0 + 70}" width="140" height="170" fill="#0c1a24"/><path d="M${VX0 + 140} ${VY0 + 70} v170 M${VX0 + 70} ${VY0 + 150} h140" stroke="${P.wallEnd}" stroke-width="8"/>
+         <g transform="translate(${VX0 + 75} ${VY0 + 270}) scale(.5)">${clock()}</g>`;
     return `<g class="bg-corridor">
       <rect width="1080" height="1920" fill="${P.floor}"/>
       <polygon points="0,0 1080,0 ${VX1},${VY0} ${VX0},${VY0}" fill="#161c23"/>
@@ -232,15 +247,58 @@
       <polygon points="1080,0 ${VX1},${VY0} ${VX1},${VY1} 1080,1920" fill="${P.wall2}"/>
       <polygon points="0,1920 ${VX0},${VY1} ${VX1},${VY1} 1080,1920" fill="${P.floor}"/>
       <path d="${tiles}" stroke="#262a30" stroke-width="3" fill="none"/>
-      <rect x="${VX0}" y="${VY0}" width="${VX1 - VX0}" height="${VY1 - VY0}" fill="${P.wallEnd}"/>
-      <rect x="${VX0 + 70}" y="${VY0 + 70}" width="140" height="170" fill="#0c1a24"/><path d="M${VX0 + 140} ${VY0 + 70} v170 M${VX0 + 70} ${VY0 + 150} h140" stroke="${P.wallEnd}" stroke-width="8"/>
-      <g transform="translate(${VX0 + 75} ${VY0 + 270}) scale(.5)">${clock()}</g>
-      ${doorL(30, 170, 41)}${doorL(240, 330, 43)}
-      ${doorR(910, 1060, '<tspan fill="#e6c88a">42</tspan>')}${doorR(740, 830, 44)}
+      ${endWall}
+      ${wall('L', .06, .38, 41)}${wall('L', .5, .72, 43)}${wall('L', .8, .92, 45)}
+      ${wall('R', .08, .4, 42, true)}${wall('R', .52, .74, 44)}${wall('R', .82, .94, 46)}
       <path class="crack" d="M120 420 l40 60 l-20 40 l50 70 l-10 50 l40 60" fill="none" stroke="#0a0d11" stroke-width="6" stroke-linejoin="bevel" opacity="${o.crack ?? 1}" stroke-dasharray="700" stroke-dashoffset="${700 * (1 - (o.crack ?? 1))}"/>
       <defs><radialGradient id="lampg"><stop offset="0" stop-color="${P.lamp}" stop-opacity=".45"/><stop offset="1" stop-color="${P.lamp}" stop-opacity="0"/></radialGradient></defs>
-      <g class="lamp" opacity="${o.lamp ?? 1}"><circle cx="540" cy="470" r="420" fill="url(#lampg)"/><rect x="470" y="420" width="140" height="22" rx="8" fill="${P.lampSoft}"/></g>
+      <g class="lamp" opacity="${o.lamp ?? 1}"><circle cx="${(VX0 + VX1) / 2}" cy="470" r="420" fill="url(#lampg)"/><rect x="${(VX0 + VX1) / 2 - 70}" y="420" width="140" height="22" rx="8" fill="${P.lampSoft}"/></g>
     </g>`;
+  }
+
+  // дверь крупным планом: номер, записка/объявление целиком в кадре
+  function bgDoorClose(o = {}) {
+    const n = o.n || 41, sway = Math.sin((o.t || 0) * 2.1) * 1.2;
+    let item = '';
+    if (o.mode === 'poster') item = `<g transform="translate(540 930) rotate(${-2 + sway}) scale(2.55) translate(-110 -150)">${poster()}</g>`;
+    else if (o.mode !== 'bare') item = `<g transform="translate(540 920) rotate(${(o.rot ?? -3) + sway}) scale(${o.s || 3.5}) translate(-92 -63)">${note(o.txt)}</g>`;
+    return `<g class="bg-door">
+      <rect width="1080" height="1920" fill="#1e2832"/>
+      ${Array.from({ length: 6 }, (_, i) => `<rect x="${i * 190 - 20}" y="0" width="4" height="1920" fill="#1a222b"/>`).join('')}
+      <defs><radialGradient id="dlg" cx=".5" cy=".4" r=".7"><stop offset="0" stop-color="${P.lamp}" stop-opacity=".30"/><stop offset="1" stop-color="${P.lamp}" stop-opacity="0"/></radialGradient></defs>
+      <rect x="130" y="90" width="820" height="1470" fill="#17110e"/><rect x="160" y="120" width="760" height="1440" fill="${P.door}"/>
+      <rect x="215" y="190" width="650" height="520" fill="none" stroke="${P.door2}" stroke-width="10"/><rect x="215" y="780" width="650" height="700" fill="none" stroke="${P.door2}" stroke-width="10"/>
+      <rect x="400" y="132" width="280" height="110" rx="14" fill="#b08b38"/><rect x="408" y="140" width="264" height="94" rx="10" fill="none" stroke="#6d5520" stroke-width="4"/>
+      <text x="540" y="218" text-anchor="middle" font-family="Inter" font-weight="900" font-size="88" fill="${n == 42 ? '#fff1c0' : '#3a2c0f'}">${n}</text>
+      <circle cx="540" cy="320" r="24" fill="#0b0d10" stroke="#8a7a5a" stroke-width="6"/>
+      <rect x="790" y="800" width="34" height="140" rx="12" fill="#8a7a5a"/><circle cx="807" cy="948" r="22" fill="#8a7a5a"/>
+      <rect x="130" y="1550" width="820" height="40" fill="#0e0b09"/>
+      <rect width="1080" height="1920" fill="url(#dlg)"/>${item}</g>`;
+  }
+
+  // комната Ильи (стрим-уголок), окно с потопом
+  function bgRoom(o = {}) {
+    const t = o.t || 0, r = rng(5); let bulbs = '', city = '';
+    for (let i = 0; i < 16; i++) { const x = 40 + i * 66, y = 120 + Math.sin(i * .9) * 26 + (x - 540) * (x - 540) / 9000; bulbs += `<circle cx="${x}" cy="${y.toFixed(0)}" r="9" fill="#ffd9a0" opacity="${(.55 + .35 * Math.sin(t * 3 + i)).toFixed(2)}"/><circle cx="${x}" cy="${y.toFixed(0)}" r="26" fill="#ffd9a0" opacity=".12"/>`; }
+    for (let i = 0; i < 7; i++) { const h = 120 + r() * 200; city += `<rect x="${100 + i * 52}" y="${700 - h}" width="46" height="${h}" fill="#0e1722"/>` + (r() < .8 ? `<rect x="${112 + i * 52}" y="${720 - h + r() * 90}" width="10" height="14" fill="${P.lamp}"/>` : ''); }
+    const rainW = Array.from({ length: 26 }, () => `M${(100 + r() * 380).toFixed(0)} ${(300 + r() * 580).toFixed(0)} l-8 36`).join(' ');
+    return `<g class="bg-room">
+      <rect width="1080" height="1920" fill="#17202a"/><rect y="1260" width="1080" height="660" fill="#10161d"/>
+      <path d="M0 0 H1080 M0 40 H1080" stroke="#1d2833" stroke-width="3"/>
+      <path d="M20 90 Q540 260 1060 90" fill="none" stroke="#2b3744" stroke-width="3"/>${bulbs}
+      <rect x="80" y="300" width="420" height="600" fill="#0b121a" stroke="#2b3744" stroke-width="14"/>
+      <defs><linearGradient id="rwg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#101a26"/><stop offset="1" stop-color="#1c3646"/></linearGradient></defs>
+      <rect x="94" y="314" width="392" height="572" fill="url(#rwg)"/>${city}<rect x="94" y="700" width="392" height="186" fill="${P.water}"/><path d="M110 740 q40 -8 80 0 M260 790 q50 -8 100 0 M130 840 q60 -8 120 0" stroke="${P.waterLine}" stroke-width="3" fill="none" opacity=".7"/>
+      <path d="${rainW}" stroke="#7f9db0" stroke-width="2" opacity=".35"/><rect x="283" y="314" width="14" height="572" fill="#2b3744"/><rect x="94" y="560" width="392" height="12" fill="#2b3744"/>
+      <circle cx="800" cy="520" r="150" fill="#f3dc96" opacity=".12" filter="url(#rb)"/><circle cx="800" cy="520" r="110" fill="none" stroke="#f3f0ea" stroke-width="22" opacity=".9"/><circle cx="800" cy="520" r="110" fill="none" stroke="#f3dc96" stroke-width="40" opacity=".25"/>
+      <rect x="570" y="660" width="460" height="300" rx="14" fill="#0c1016" stroke="#2c3642" stroke-width="12"/><rect x="584" y="674" width="432" height="272" fill="#14202c"/>
+      <circle cx="610" cy="702" r="9" fill="${P.red}" opacity="${(t * 2 | 0) % 2 ? 1 : .35}"/><text x="630" y="710" font-family="Inter" font-weight="800" font-size="22" fill="${P.red}">LIVE</text>
+      ${Array.from({ length: 6 }, (_, i) => `<rect x="610" y="${740 + i * 32}" width="${120 + ((i * 53) % 160)}" height="14" rx="7" fill="#2b4256"/>`).join('')}<rect x="840" y="740" width="150" height="180" rx="8" fill="#1d3345"/>
+      <rect x="780" y="960" width="40" height="60" fill="#1a2028"/><rect x="720" y="1010" width="160" height="14" rx="6" fill="#1a2028"/>
+      <rect x="40" y="1220" width="1000" height="40" rx="8" fill="#2a2018"/><rect x="80" y="1260" width="26" height="420" fill="#1a1510"/><rect x="974" y="1260" width="26" height="420" fill="#1a1510"/>
+      <rect x="560" y="1180" width="360" height="30" rx="8" fill="#1f2630"/><rect x="170" y="1160" width="64" height="62" rx="10" fill="#3a2f28"/><path d="M234 1176 q30 0 0 30" stroke="#3a2f28" stroke-width="8" fill="none"/>
+      <rect x="0" y="1280" width="1080" height="640" fill="#000" opacity=".25"/>
+      <defs><filter id="rb"><feGaussianBlur stdDeviation="30"/></filter></defs></g>`;
   }
 
   function bgBasement(o = {}) {
@@ -259,8 +317,8 @@
       ${rivets}
       <rect x="790" y="960" width="120" height="170" rx="10" fill="#1d2328"/>${keys}<circle cx="850" cy="980" r="6" fill="${P.red}" class="led"/>
       <rect x="640" y="1080" width="60" height="22" rx="8" fill="#6a7277"/>
-      <g class="digits" transform="rotate(-3 540 420)"><text x="540" y="470" text-anchor="middle" font-family="DejaVu Serif" font-size="190" letter-spacing="40" fill="none" stroke="#b7c0c6" stroke-width="6" opacity=".8">4 1 9 7</text>
-        <path d="M250 520 L830 500" stroke="#b7c0c6" stroke-width="4" opacity=".5"/><path d="M880 330 v80 M900 330 v80 M920 330 v80 M940 330 v80 M870 390 L960 350" stroke="#8b949a" stroke-width="5" opacity=".6"/></g>
+      ${o.digits === false ? '' : `<g class="digits" transform="rotate(-3 540 420)"><text x="540" y="470" text-anchor="middle" font-family="DejaVu Serif" font-size="190" letter-spacing="40" fill="none" stroke="#b7c0c6" stroke-width="6" opacity=".8">4 1 9 7</text>
+        <path d="M250 520 L830 500" stroke="#b7c0c6" stroke-width="4" opacity=".5"/><path d="M880 330 v80 M900 330 v80 M920 330 v80 M940 330 v80 M870 390 L960 350" stroke="#8b949a" stroke-width="5" opacity=".6"/></g>`}
       ${stairs}
       ${water(1520, 5, o.t)}
       <defs><radialGradient id="flash"><stop offset="0" stop-color="${P.lampSoft}" stop-opacity=".22"/><stop offset="1" stop-color="${P.lampSoft}" stop-opacity="0"/></radialGradient></defs>
@@ -310,5 +368,5 @@
     </g>`;
   }
 
-  g.POTOP = { P, rng, ilya, vera, anya, cat, neighbor, clock, phone, note, poster, whistle, pills, rain, car, water, bgFlood, bgCorridor, bgBasement, bgBoat, bgCity };
+  g.POTOP = { P, rng, ilya, vera, anya, cat, neighbor, clock, phone, note, poster, whistle, pills, rain, car, water, bgFlood, bgCorridor, bgDoorClose, bgRoom, bgBasement, bgBoat, bgCity };
 })(typeof window !== 'undefined' ? window : globalThis);

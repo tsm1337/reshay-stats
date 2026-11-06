@@ -12,34 +12,31 @@ const E = (t, a, b) => ease(ramp(t, a, b));
 const lerp = (a, b, k) => a + (b - a) * k;
 const noise = (t, s = 1) => Math.sin(t * 13.1 * s) * .5 + Math.sin(t * 7.7 * s + 1.3) * .3 + Math.sin(t * 23.3 * s + 2.1) * .2;
 const cam = (s, cx, cy, r = 0, sx = 0, sy = 0) => `translate(${540 + sx} ${960 + sy}) rotate(${r}) scale(${s}) translate(${-cx} ${-cy})`;
-const put = (svg, x, y, s, flip = false) => `<g transform="translate(${x} ${y}) scale(${flip ? -s : s} ${s}) translate(-100 -392)">${svg}</g>`; // ступни в (x,y)
+const put = (svg, x, y, s, flip = false, rot = 0) => `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${flip ? -s : s} ${s}) translate(-100 -392)">${svg}</g>`; // ступни в (x,y)
 const blinkAt = (t, period = 3.7, off = 0) => ((t + off) % period) < .12;
 const breathe = t => 1 + Math.sin(t * 2.2) * .006;
+const pop = (t, a, d = .22) => { const k = ramp(t, a, a + d); return k <= 0 ? 0 : 1 + Math.sin(k * Math.PI) * .12 * (1 - k) + 0; };
 
-let WORDS = [], GROUPS = [];
-const KEY = { 'море': 'y', 'машины': 'y', 'кот': 'y', 'поезд': 'y', 'болен': 'r', 'Вера': 'y', '21:14': 'r', 'затрещал': 'r', 'крениться': 'r', 'записка': 'y', 'подвал': 'r', 'цифры': 'y', 'лодка': 'y', 'одного': 'r', 'десять': 'r', 'сердце': 'r', 'почерк': 'y', 'Аня': 'y', 'утра': 'y', 'вечер': 'r', 'свет': 'y', 'кроме': 'r', 'нашего': 'r', 'дома': 'r' };
+let WORDS = [], GROUPS = [], WM = {}, S = [], OUTRO = 2.2;
+const T = i => WM[i].s, TE = i => WM[i].e;
+const KEY = { 'море': 'y', 'кот': 'y', 'поезд': 'y', 'болен': 'r', 'Вера': 'y', '21:14': 'r', 'затрещал': 'r', 'крениться': 'r', 'записка': 'y', 'подвал': 'r', 'цифры': 'y', 'лодка': 'y', 'одного': 'r', 'десять': 'r', 'сердце': 'r', 'почерк': 'y', 'Аня': 'y', 'вечер': 'r', 'свет': 'y', 'кроме': 'r', 'нашего': 'r', 'дома': 'r' };
 function prepWords(raw) {
   const out = [];
-  for (let i = 0; i < raw.length; i++) {
-    let w = raw[i];
-    if (w.w.startsWith('двадцать') && raw[i + 2] && raw[i + 2].w.startsWith('четырнадцать')) { out.push({ d: '21:14', s: w.s, e: raw[i + 2].e, end: false }); i += 2; continue; }
-    const end = /[.…:»!?]$/.test(w.w) || /,$/.test(w.w);
-    const d = w.w.replace(/[«»…]/g, '').replace(/[.,:;!?]+$/, '');
-    out.push({ d, s: w.s, e: w.e, end });
+  for (let k = 0; k < raw.length; k++) {
+    const w = raw[k];
+    if (w.w.startsWith('двадцать') && raw[k + 2] && raw[k + 2].w.startsWith('четырнадцать')) { out.push({ d: '21:14', s: w.s, e: raw[k + 2].e, end: false, i: w.i }); k += 2; continue; }
+    out.push({ d: w.w.replace(/[«»…]/g, '').replace(/[.,:;!?]+$/, ''), s: w.s, e: w.e, end: /[.…:»!?,]$/.test(w.w), i: w.i });
   }
-  // «Утром…дома» последнее слово фразы о доме — особый случай: «дома…» в 21:14 не красим
   return out;
 }
 function makeGroups(ws) {
   const G = []; let g = [];
   ws.forEach((w, i) => {
     g.push(w);
-    const len = g.reduce((a, x) => a + x.d.length + 1, 0);
-    const next = ws[i + 1];
+    const len = g.reduce((a, x) => a + x.d.length + 1, 0), next = ws[i + 1];
     if (w.end || g.length >= 3 || len > 15 || (next && next.s - w.e > .6) || !next) {
       const last = g[g.length - 1];
-      if (!w.end && next && g.length > 1 && /^(в|с|во|на|а|и|из|мы|я|не|что)$/i.test(last.d)) { g.pop(); G.push(g); g = [last]; }
-      else { G.push(g); g = []; }
+      if (!w.end && next && g.length > 1 && /^(в|с|во|на|а|и|из|мы|я|не|что)$/i.test(last.d)) { g.pop(); G.push(g); g = [last]; } else { G.push(g); g = []; }
     }
   });
   G.forEach((g, i) => { g.s = g[0].s - .06; g.e = Math.min(G[i + 1] ? G[i + 1][0].s - .06 : 99, g[g.length - 1].e + .7); });
@@ -47,15 +44,14 @@ function makeGroups(ws) {
 }
 function subtitles(t) {
   const g = GROUPS.find(g => t >= g.s && t < g.e); if (!g) return '';
-  const pop = E(t, g.s, g.s + .12);
+  const p = E(t, g.s, g.s + .12);
   const sp = g.map((w, i) => {
     const active = t >= w.s - .03, cur = active && (i === g.length - 1 || t < g[i + 1].s - .03);
-    let k = KEY[w.d]; if (w.d === 'дома' && t < 40) k = null;
+    let k = KEY[w.d]; if (w.d === 'дома' && t < T(61) - .2) k = null;
     const col = k === 'r' ? '#ff5444' : k === 'y' ? '#f2cf63' : '#ffffff';
-    return `<tspan fill="${col}" fill-opacity="${active ? 1 : .5}" font-size="${cur ? 92 : 84}">${w.d}${i < g.length - 1 ? '\u00A0' : ''}</tspan>`;
+    return `<tspan fill="${col}" fill-opacity="${active ? 1 : .5}" font-size="${cur ? 92 : 84}">${w.d}${i < g.length - 1 ? ' ' : ''}</tspan>`;
   }).join('');
-  return `<g transform="translate(540 1585) scale(${lerp(.9, 1, pop)})" opacity="${pop}">
-    <text x="0" y="0" text-anchor="middle" font-family="Inter" font-weight="900" stroke="#05070a" stroke-width="14" stroke-linejoin="round" paint-order="stroke" letter-spacing="1">${sp}</text></g>`;
+  return `<g transform="translate(540 1585) scale(${lerp(.9, 1, p)})" opacity="${p}"><text x="0" y="0" text-anchor="middle" font-family="Inter" font-weight="900" stroke="#05070a" stroke-width="14" stroke-linejoin="round" paint-order="stroke" letter-spacing="1">${sp}</text></g>`;
 }
 function rainOverlay(t, op = .4, speed = 1500) {
   const y = (t * speed) % 1920;
@@ -69,148 +65,141 @@ function dust(t, n = 26) {
 const vignette = (k = .85) => `<rect width="1080" height="1920" fill="url(#vig)" opacity="${k}"/>`;
 const flash = (t, at, d = .35, c = '#dfe9f2', m = .55) => (t >= at && t < at + d) ? `<rect width="1080" height="1920" fill="${c}" opacity="${m * (1 - (t - at) / d)}"/>` : '';
 const lampFlicker = (t, k = 1) => { const n = Math.abs(noise(t, 1.7)); return 1 - k * (n > .62 ? .75 : n * .15); };
-const TILT = t => t < 34.1 ? 0 : -5 * E(t, 34.1, 36.0);
+let TT = 99;                                      // момент, когда дом начинает крениться
+const TILT = t => t < TT ? 0 : -5 * E(t, TT, TT + 1.9);
+const sc = (a, b, f) => S.push({ a, b, f });
+const noteAt = (cx, cy, s, rot, txt) => `<g transform="translate(${cx} ${cy}) rotate(${rot}) scale(${s}) translate(-92 -63)"><g filter="url(#sh)">${A.note(txt)}</g></g>`;
 
-// ---------- СЦЕНЫ ----------
-const S = [];
-const sc = (a, b, f, o = {}) => S.push({ a, b, f, ...o });
+function buildScenes() {
+  S = []; TT = T(63) - .05;
+  const a1 = T(13) - .15, a2 = T(23) - .2, a3 = T(36) - .15, a4 = T(42) - .3, a5 = T(53) - .2, a6 = T(58) - .1, a7 = T(61) - .1, a8 = T(63) - .1, a9 = T(67) - .15,
+    a10 = T(70) - .05, a11 = T(72) - .1, a12 = T(76) - .15, a13 = T(78) - .1, a14 = T(83) - .1, a15 = T(87) - .2, a16 = T(94) - .2, a17 = T(98) - .2,
+    a18 = T(106) - .15, a19 = T(111) - .1, a20 = T(122) - .15, a21 = T(127) - .15, VE = WORDS[WORDS.length - 1].e + .25;
+  window.VOICE_END = VE; window.DURATION = VE + OUTRO;
 
-sc(0, 5.6, t => { // 1. окно: под окном море
-  const z = lerp(1.0, 1.16, E(t, 0, 5.6));
-  return { w: `<g transform="${cam(z, 540, lerp(930, 1010, E(t, 0, 5.6)), 0, noise(t, .3) * 3, noise(t + 3, .3) * 3)}">${A.bgFlood({ t, noRain: true })}</g>${rainOverlay(t, .5)}${flash(t, 3.84, .45)}`, };
-});
-sc(5.6, 7.9, t => { // 2. мимо плыли машины
-  const z = lerp(1.3, 1.5, E(t, 5.6, 7.9));
-  return { w: `<g transform="${cam(z, lerp(460, 640, E(t, 5.6, 7.9)), 1260, 0)}">${A.bgFlood({ t, noRain: true })}</g>${rainOverlay(t, .45)}` };
-});
-sc(7.9, 13.25, t => { // 3. кот смотрит прямо на меня
-  const dx = t * 6, cx = 690 + dx, cy = 1190 + Math.sin(t * 1.1) * 8;
-  const z = lerp(2.4, 3.4, E(t, 7.9, 13.2));
-  const look = t < 10.5 ? -6 : lerp(-6, 0, E(t, 10.5, 10.9));
-  const glow = E(t, 10.6, 11.2);
-  const catO = { look, blink: blinkAt(t, 2.6, .9) && t < 10.4 };
-  return { w: `<g transform="${cam(z, cx, cy, 0)}">${A.bgFlood({ t, noRain: true, cat: catO })}
-     <g opacity="${glow * .6}"><circle cx="${cx - 10}" cy="${cy}" r="14" fill="#f5d85a" filter="url(#blur6)"/><circle cx="${cx + 10}" cy="${cy}" r="14" fill="#f5d85a" filter="url(#blur6)"/></g></g>${rainOverlay(t, .35)}` };
-});
-sc(13.25, 16.35, t => { // 4. последний поезд
-  const ph = E(t, 14.8, 15.3);
-  return { w: `<g transform="${cam(lerp(1.05, 1.12, E(t, 13.2, 16.3)), 540, 1000)}">${A.bgCorridor({ lamp: lampFlicker(t) })}
-      ${put(A.ilya({ blink: blinkAt(t) }), 540, 1720, 2.05 * breathe(t))}</g>
-    <g transform="translate(${lerp(1300, 700, ph)} ${lerp(1100, 760, ph)}) rotate(${lerp(20, -6, ph)}) scale(1.7)">${A.phone()}</g>${dust(t)}` };
-});
-sc(16.35, 22.6, t => { // 5. никто не знал, что я болен
-  const z = lerp(1.0, 1.25, E(t, 16.3, 22.5));
-  const gl = Math.max(0, 1 - Math.abs(t - 18.2) * 2.2);
-  return { w: `<g transform="${cam(1.7 * z, 540, 1000)}">${A.bgCorridor({ lamp: lampFlicker(t + 4) })}
-      ${put(A.ilya({ blink: blinkAt(t, 3.1) }), 540, 1720, 2.05 * breathe(t))}
-      <g opacity="${gl}" transform="translate(${540 + (112 - 100) * 2.05} ${1720 + (228 - 392) * 2.05})"><path d="M0 -26 L5 -5 L26 0 L5 5 L0 26 L-5 5 L-26 0 L-5 -5Z" fill="#fff3c0"/></g></g>
-    ${dust(t)}` };
-});
-sc(22.6, 27.65, t => { // 6. Вера; вспышка-воспоминание о поезде
-  const v = E(t, 22.6, 23.5);
-  let fb = '';
-  const fo = Math.min(E(t, 24.1, 24.4), 1 - E(t, 26.0, 26.4));
-  if (fo > 0) {
-    const r = A.rng(3); let lights = '';
-    for (let i = 0; i < 9; i++) { const x = ((r() * 1400 - t * 1600) % 1400 + 1400) % 1400 - 160; lights += `<rect x="${x.toFixed(0)}" y="${(560 + r() * 380).toFixed(0)}" width="${(60 + r() * 140).toFixed(0)}" height="6" rx="3" fill="#f3dc96" opacity=".7"/>`; }
-    fb = `<g opacity="${fo}"><rect width="1080" height="1920" fill="#1d1712"/><rect x="90" y="480" width="900" height="540" rx="40" fill="#0a0d12"/>${lights}
-      <path fill-rule="evenodd" d="M0 0H1080V1920H0Z M90 480 H990 V1020 H90Z" fill="#2a2018"/>
-      ${put(A.ilya({}), 330, 1700, 1.6)}${put(A.vera({ beam: false }), 760, 1700, 1.6, true)}
-      <rect width="1080" height="1920" fill="#c79a5a" opacity=".18"/><text x="540" y="380" text-anchor="middle" font-family="Inter" font-weight="800" font-size="40" letter-spacing="8" fill="#c9b79a" opacity=".7">НЕДЕЛЮ НАЗАД</text></g>`;
-  }
-  return { w: `<g transform="${cam(1.08, 540, 1000)}">${A.bgCorridor({ lamp: lampFlicker(t + 9) })}
-      ${put(A.ilya({ blink: blinkAt(t) }), 360, 1730, 1.95 * breathe(t))}
-      ${put(A.vera({}), lerp(1350, 780, v), 1730, 1.95 * breathe(t + 1), true)}</g>${dust(t)}${fb}` };
-});
-sc(27.65, 31.85, t => { // 7. 21:14, все дома
-  if (t < 29.85) {
-    const colon = (t * 2 | 0) % 2 ? '21 14' : '21:14';
-    return { w: `<rect width="1080" height="1920" fill="#1b232c"/><rect width="1080" height="1920" fill="url(#lampR)" opacity="${lampFlicker(t) * .7}"/>
-      <g transform="translate(540 900) scale(${lerp(3.2, 3.6, E(t, 27.6, 29.9))}) translate(-130 -55)">${A.clock(colon)}</g>${dust(t)}` };
-  }
-  const k = E(t, 29.85, 31.8);
-  let strips = '';
-  [[100, 1500], [285, 1370], [985, 1500], [785, 1370]].forEach(([x, y], i) => strips += `<rect x="${x - 50}" y="${y}" width="100" height="10" fill="#f3dc96" opacity="${.5 + .3 * Math.sin(t * 5 + i)}"/>`);
-  return { w: `<g transform="${cam(lerp(1.0, 1.08, k), 540, 1000)}">${A.bgCorridor({ lamp: lampFlicker(t) * .8, crack: 0 })}${strips}</g>${dust(t)}` };
-});
-sc(31.85, 33.85, t => { // 8. дом затрещал
-  const sh = Math.max(0, 1 - (t - 31.95) / 1.6) * (t > 31.95 ? 1 : 0);
-  return { w: `<g transform="${cam(1.12, 540, 1000, noise(t, 3) * 1.2 * sh, noise(t, 4) * 26 * sh, noise(t + 2, 4) * 20 * sh)}">${A.bgCorridor({ lamp: t > 31.95 ? lampFlicker(t * 3, 1) : 1, crack: E(t, 31.95, 32.9) })}</g>${dust(t, 40)}${flash(t, 31.97, .2, '#fff', .25)}` };
-});
-sc(33.85, 36.35, t => { // 9. дом кренится
-  const k = E(t, 34.1, 36.0), bx = lerp(260, 840, E(t, 34.4, 36.3));
-  return { w: `<g transform="${cam(1.14, 540, 1000, TILT(t), noise(t, 1) * 4, 0)}">${A.bgCorridor({ lamp: lampFlicker(t * 2) })}
-      <g transform="translate(${bx} 1640) rotate(${bx * 1.2})"><rect x="-55" y="-18" width="90" height="36" rx="16" fill="#2f5a45" opacity=".9"/><rect x="35" y="-9" width="26" height="18" rx="4" fill="#2f5a45"/></g></g>${dust(t)}` };
-});
-sc(36.35, 41.35, t => { // 10. записки «не спускайтесь в подвал»
-  const z = lerp(1.1, 2.6, E(t, 37.2, 38.6)), big = E(t, 38.7, 39.1);
-  return { w: `<g transform="${cam(z, lerp(540, 985, E(t, 37.2, 38.6)), lerp(1000, 820, E(t, 37.2, 38.6)), TILT(t))}">${A.bgCorridor({ lamp: lampFlicker(t + 2) })}</g>${dust(t)}
-    <g opacity="${big}" transform="translate(540 820) rotate(${lerp(8, -3, big) + Math.sin(t * 2) * .6}) scale(${lerp(3.2, 4.4, big)}) translate(-92 -63)">${A.note()}</g>` };
-});
-sc(41.35, 43.15, t => { // 11. мы спустились
-  return { w: `<g transform="${cam(1.3, lerp(300, 520, E(t, 41.3, 43.1)), lerp(860, 1180, E(t, 41.3, 43.1)), TILT(t), noise(t, .6) * 6, Math.sin(t * 5) * 6)}">${A.bgBasement({ t })}</g>${dust(t, 20)}` };
-});
-sc(43.15, 49.15, t => { // 12. кодовый замок и цифры на стене
-  const k1 = E(t, 43.3, 44.5), k2 = E(t, 46.2, 47.6);
-  const cx = lerp(lerp(540, 850, k1), 540, k2), cy = lerp(lerp(1100, 1045, k1), 560, k2), z = lerp(lerp(1.1, 2.4, k1), 1.15, k2);
-  const led = (t * 3 | 0) % 2 ? 1 : .25, dg = E(t, 47.7, 48.2);
-  return { w: `<g transform="${cam(z, cx, cy, TILT(t), noise(t, .5) * 4, 0)}">${A.bgBasement({ t })}
-      <circle cx="850" cy="980" r="16" fill="#ff5444" opacity="${led * .5}" filter="url(#blur6)"/>
-      <g opacity="${dg}"><text x="540" y="470" transform="rotate(-3 540 420)" text-anchor="middle" font-family="DejaVu Serif" font-size="190" letter-spacing="40" fill="none" stroke="#f2cf63" stroke-width="7" filter="url(#blur3)">4 1 9 7</text></g></g>${dust(t, 20)}` };
-});
-sc(49.15, 54.4, t => { // 13. лодка на одного
-  const z = lerp(1.0, 1.35, E(t, 49.1, 54.4)), hl = E(t, 51.4, 52.2);
-  return { w: `<g transform="${cam(z, 540, lerp(1000, 1220, E(t, 49.1, 54.4)), TILT(t) * .6)}">
-      <g transform="translate(0 ${Math.sin(t * 1.6) * 6})">${A.bgBoat()}</g>
+  // 1. Крючок: окно, вместо улицы море. Молния в первые полсекунды
+  sc(0, a1, t => ({ w: `<g transform="${cam(lerp(1.0, 1.18, E(t, 0, a1)), 540, lerp(930, 1010, E(t, 0, a1)), 0, noise(t, .3) * 3, noise(t + 3, .3) * 3)}">${A.bgFlood({ t, noRain: true })}</g>${rainOverlay(t, .5)}${flash(t, .25, .5, '#e6f0fa', .4)}${flash(t, T(9) - .1, .45, '#dfe9f2', .45)}` }));
+  // 2. Машины → кот смотрит на меня
+  sc(a1, a2, t => {
+    const dx = t * 6, cx = 690 + dx, cy = 1190 + Math.sin(t * 1.1) * 8, z = lerp(1.5, 3.4, E(t, a1, T(17) + .5));
+    const look = t < T(19) - .2 ? -6 : lerp(-6, 0, E(t, T(19) - .2, T(19) + .2)), glow = E(t, T(19), T(19) + .6);
+    return { w: `<g transform="${cam(z, lerp(560, cx, E(t, a1, T(17)) ), lerp(1260, cy, E(t, a1, T(17))), 0)}">${A.bgFlood({ t, noRain: true, cat: { look, blink: blinkAt(t, 2.6, .9) && t < T(19) - .3 } })}
+      <g opacity="${glow * .6}"><circle cx="${cx - 10}" cy="${cy}" r="14" fill="#f5d85a" filter="url(#blur6)"/><circle cx="${cx + 10}" cy="${cy}" r="14" fill="#f5d85a" filter="url(#blur6)"/></g></g>${rainOverlay(t, .35)}` };
+  });
+  // 3. Комната Ильи: последний поезд
+  sc(a2, a3, t => {
+    const ph = E(t, T(28) - .1, T(28) + .4);
+    return { w: `<g transform="${cam(lerp(1.0, 1.12, E(t, a2, a3)), 540, 1000)}">${A.bgRoom({ t })}${put(A.ilya({ blink: blinkAt(t) }), 440, 1790, 2.15 * breathe(t))}</g>
+      <g transform="translate(${lerp(1300, 760, ph)} ${lerp(1000, 640, ph)}) rotate(${lerp(18, -5, ph)}) scale(1.75)">${A.phone()}</g>${dust(t)}` };
+  });
+  // 4. Крупный план: «Никто не знал, что я болен»
+  sc(a3, a4, t => ({ w: `<g transform="${cam(lerp(2.9, 3.4, E(t, a3, a4)), 540, 1090, 0, noise(t, .5) * 3, 0)}">${A.bgRoom({ t })}${put(A.ilya({ blink: blinkAt(t, 3.1) }), 440 + 100, 1790, 2.15 * breathe(t))}</g>${dust(t)}`, vig: 1 }));
+  // 5. Вера идёт из глубины коридора, Илья спиной (из-за спины)
+  sc(a4, a5, t => {
+    const k = E(t, a4, a5 - .1);
+    return { w: `<g transform="${cam(1.05, 540, 1000, 0)}">${A.bgCorridor({ end: 'exit', vx: -40, lamp: lampFlicker(t + 5), notes: false })}
+      ${put(A.vera({ beam: false }), lerp(580, 640, k), lerp(1120, 1780, k), lerp(.5, 1.75, k), false)}
+      <g opacity="${E(t, a4 + .1, a4 + .5) * .5}"><polygon points="${lerp(590, 760, k)},${lerp(1000, 1450, k)} 1080,${lerp(900, 1100, k)} 1080,${lerp(1220, 1780, k)}" fill="#f3dc96" opacity=".35"/></g>
+      ${put(A.ilya({ back: true }), 190, 1920, 2.7 * breathe(t))}</g>${dust(t)}` };
+  });
+  // 6. 21:14 — крупно часы
+  sc(a5, a6, t => ({ w: `<rect width="1080" height="1920" fill="#1b232c"/><rect width="1080" height="1920" fill="url(#lampR)" opacity="${lampFlicker(t) * .7}"/>
+    <g transform="translate(540 900) scale(${lerp(3.2, 3.6, E(t, a5, a6))}) translate(-130 -55)">${A.clock((t * 2 | 0) % 2 ? '21 14' : '21:14')}</g>${dust(t)}` }));
+  // 7. «Все были дома» — вид из дверного проёма, свет из-под дверей
+  sc(a6, a7, t => {
+    const k = E(t, a6, a7);
+    return { w: `<g transform="${cam(lerp(1.05, 1.28, k), lerp(600, 520, k), 1000, 0)}">${A.bgCorridor({ vx: 190, strips: true, lamp: lampFlicker(t + 2) * .85, crack: 0 })}</g>
+      <polygon points="0,0 260,0 200,1920 0,1920" fill="#06080b"/><polygon points="0,0 1080,0 1080,150 0,210" fill="#06080b"/><polygon points="200,210 260,0 270,0 215,1920 200,1920" fill="#14100d"/>${dust(t)}` };
+  });
+  // 8. Дом затрещал: из-за спины, трещина, тряска
+  sc(a7, a8, t => {
+    const sh = Math.max(0, 1 - (t - a7) / 1.4);
+    return { w: `<g transform="${cam(1.12, 540, 1000, noise(t, 3) * 1.4 * sh, noise(t, 4) * 26 * sh, noise(t + 2, 4) * 20 * sh)}">${A.bgCorridor({ vx: -110, lamp: lampFlicker(t * 3, 1), crack: E(t, a7, a7 + .9), notes: false })}
+      ${put(A.ilya({ back: true }), 290, 1980, 2.9)}</g>${dust(t, 40)}${flash(t, a7 + .05, .2, '#fff', .25)}` };
+  });
+  // 9. Дом кренится: комната, всё едет, Илья пошатывается
+  sc(a8, a9, t => {
+    const k = E(t, a8, a9 - .2), bx = lerp(150, 980, E(t, a8 + .2, a9 - .1));
+    return { w: `<g transform="${cam(1.2, 540, 1000, TILT(t), noise(t, 1) * 5, 0)}">${A.bgRoom({ t: t * 3 })}
+      <g transform="translate(${bx} 1196) rotate(${bx * 1.4})"><rect x="-18" y="-24" width="36" height="48" rx="10" fill="#2f5a45"/><rect x="-7" y="-40" width="14" height="18" rx="4" fill="#2f5a45"/></g>
+      ${put(A.ilya({ blink: blinkAt(t) }), 480, 1790, 2.15, false, Math.sin(t * 7) * 3 * (1 - k * .4))}</g>${dust(t)}${flash(t, a8, .12, '#fff', .15)}` };
+  });
+  // 10. Двери с записками — крупные, целиком в кадре
+  sc(a9, a10, t => ({ w: `<g transform="${cam(1.17, 540, 880, TILT(t), noise(t, .8) * 3, 0)}">${A.bgDoorClose({ n: 41, mode: T(69) > t ? 'bare' : 'note', t, rot: -3 })}</g>${dust(t, 14)}` }));
+  sc(a10, a11, t => ({ w: `<g transform="${cam(lerp(1.17, 1.22, E(t, a10, a11)), 540, 880, TILT(t), 0, 0)}">${A.bgDoorClose({ n: 44, mode: t < a10 + .12 ? 'bare' : 'note', t, rot: 4, s: 3.5 })}</g>${dust(t, 14)}` }));
+  sc(a11, a12, t => {
+    const k = pop(t, T(72) - .05, .3);
+    return { w: `<g transform="${cam(1.17, 540, 880, TILT(t) * .6)}">${A.bgDoorClose({ n: 41, mode: 'bare', t })}</g><rect width="1080" height="1920" fill="#000" opacity=".58"/>
+      <g transform="translate(540 880) scale(${k * lerp(1, 1.04, E(t, a11, a12))}) translate(-540 -880)">${noteAt(540, 880, 4.6, -2 + Math.sin(t * 2) * .5)}</g>${dust(t, 10)}` };
+  });
+  // 11. Подвал: спуск → замок → цифры
+  sc(a12, a13, t => ({ w: `<g transform="${cam(1.3, lerp(300, 520, E(t, a12, a13)), lerp(860, 1180, E(t, a12, a13)), TILT(t), noise(t, .6) * 6, Math.sin(t * 5) * 6)}">${A.bgBasement({ t, digits: false })}</g>${dust(t, 20)}` }));
+  sc(a13, a14, t => {
+    const k1 = E(t, a13, a13 + 1.2), led = (t * 3 | 0) % 2 ? 1 : .25;
+    return { w: `<g transform="${cam(lerp(1.1, 2.4, k1), lerp(540, 850, k1), lerp(1100, 1045, k1), TILT(t), noise(t, .5) * 4, 0)}">${A.bgBasement({ t, digits: false })}<circle cx="850" cy="980" r="16" fill="#ff5444" opacity="${led * .5}" filter="url(#blur6)"/></g>${dust(t, 20)}` };
+  });
+  sc(a14, a15, t => {
+    const k2 = E(t, a14, a14 + .8), dg = E(t, T(86) - .1, T(86) + .35);
+    return { w: `<g transform="${cam(lerp(2.4, 1.0, k2), lerp(850, 540, k2), lerp(1045, 600, k2), TILT(t), noise(t, .5) * 4, 0)}">${A.bgBasement({ t, digits: false })}
+      <g opacity="${dg}"><text x="556" y="470" transform="rotate(-3 540 420)" text-anchor="middle" font-family="DejaVu Serif" font-size="165" letter-spacing="28" fill="none" stroke="#f2cf63" stroke-width="7" filter="url(#blur3)">4 1 9 7</text><text x="556" y="470" transform="rotate(-3 540 420)" text-anchor="middle" font-family="DejaVu Serif" font-size="165" letter-spacing="28" fill="none" stroke="#fff1c0" stroke-width="3">4 1 9 7</text></g></g>${dust(t, 20)}` };
+  });
+  // 12. Лодка на одного
+  sc(a15, a16, t => {
+    const hl = E(t, T(91) - .1, T(91) + .6);
+    return { w: `<g transform="${cam(lerp(1.0, 1.35, E(t, a15, a16)), 540, lerp(1000, 1220, E(t, a15, a16)), TILT(t) * .6)}"><g transform="translate(0 ${Math.sin(t * 1.6) * 6})">${A.bgBoat()}</g>
       <ellipse cx="540" cy="1260" rx="${lerp(150, 300, hl)}" ry="90" fill="#f3dc96" opacity="${hl * .12}" filter="url(#blur6)"/></g>` };
-});
-sc(54.4, 56.65, t => { // 14. а нас было десять
-  let ppl = '';
-  const pos = [[150, 1500, .9], [300, 1440, .95], [460, 1470, 1], [620, 1430, .92], [780, 1480, 1], [930, 1450, .9], [230, 1250, .75], [400, 1230, .78], [700, 1240, .8], [860, 1260, .76]];
-  pos.sort((a, b) => a[1] - b[1]).forEach(([x, y, s], i) => {
-    const on = E(t, 54.6 + i * .06, 54.9 + i * .06), eyes = t > 55.1 + i * .05;
-    ppl += `<g opacity="${on}">${put(A.neighbor(i).replace(/fill="#a9dbe3"/g, `fill="#a9dbe3" opacity="${eyes ? 1 : 0}"`), x, y + 260, 1.9 * s)}</g>`;
   });
-  return { w: `<g transform="${cam(lerp(1.0, 1.08, E(t, 54.4, 56.6)), 540, 1000, TILT(t) * .5)}"><rect width="1080" height="1920" fill="#0d1014"/>
-      <rect width="1080" height="1920" fill="url(#flashC)"/>${ppl}</g>` };
-});
-sc(56.65, 60.75, t => { // 15. тишина, слышно сердце
-  const bt = ((t - 56.74) % 0.9 + 0.9) % 0.9, beat = t < 56.74 ? 0 : Math.max(Math.exp(-Math.pow(bt / .07, 2)), .7 * Math.exp(-Math.pow((bt - .3) / .07, 2))), z = 3.6 * (1 + beat * .025) * lerp(1, 1.12, E(t, 56.6, 60.7));
-  return { w: `<g transform="${cam(z, 540, 1720 - 300 * 2.05 + 20, TILT(t))}">${A.bgCorridor({ lamp: .35 })}${put(A.ilya({ blink: blinkAt(t, 2.9) }), 540, 1720, 2.05)}</g>
-      <rect width="1080" height="1920" fill="#6b0f0f" opacity="${beat * .22}"/>`, vig: 1 };
-});
-sc(60.75, 65.85, t => { // 16. почерк, Аня из 42-й
-  if (t < 62.95) {
-    const k = E(t, 60.8, 62.9);
-    return { w: `<rect width="1080" height="1920" fill="#14191f"/><rect width="1080" height="1920" fill="url(#lampR)" opacity=".5"/>
-      <g transform="translate(540 760) rotate(-4) scale(${lerp(3.4, 3.8, k)}) translate(-92 -63)">${A.note()}</g>
-      <g transform="translate(560 1180) rotate(5) scale(3.4) translate(-92 -63)" opacity="${E(t, 61.3, 61.8)}">${A.note(['Аня, к. 42', 'конспект'])}</g>
-      <rect x="160" y="${lerp(640, 1180, E(t, 61.8, 62.6))}" width="760" height="6" fill="#f2cf63" opacity="${E(t, 61.6, 61.9) * .6}"/>${dust(t)}` };
-  }
-  return { w: `<g transform="${cam(lerp(1.4, 2.6, E(t, 63.0, 64.8)), lerp(700, 985, E(t, 63.0, 64.8)), lerp(900, 560, E(t, 63.0, 64.8)), TILT(t))}">${A.bgCorridor({ lamp: lampFlicker(t + 5) })}</g>${dust(t)}` };
-});
-sc(65.85, 71.35, t => { // 17. её искали с утра; записки весь вечер
-  let notes = '';
-  [[150, 250, -12], [930, 270, 9], [110, 900, 7], [970, 980, -8], [170, 1380, 4], [910, 1400, -5]].forEach(([x, y, r], i) => {
-    const k = E(t, 68.5 + i * .22, 68.75 + i * .22); if (k <= 0) return;
-    notes += `<g transform="translate(${x} ${y}) rotate(${r}) scale(${1.4 * k}) translate(-92 -63)">${A.note()}</g>`;
+  // 13. Нас было десять
+  sc(a16, a17, t => {
+    let ppl = '';
+    const pos = [[150, 1500, .9], [300, 1440, .95], [460, 1470, 1], [620, 1430, .92], [780, 1480, 1], [930, 1450, .9], [230, 1250, .75], [400, 1230, .78], [700, 1240, .8], [860, 1260, .76]];
+    pos.sort((a, b) => a[1] - b[1]).forEach(([x, y, s], i) => {
+      const on = E(t, T(94) - .1 + i * .06, T(94) + .2 + i * .06), eyes = t > T(97) - .1 + i * .05;
+      ppl += `<g opacity="${on}">${put(A.neighbor(i).replace(/fill="#a9dbe3"/g, `fill="#a9dbe3" opacity="${eyes ? 1 : 0}"`), x, y + 260, 1.9 * s)}</g>`;
+    });
+    return { w: `<g transform="${cam(lerp(1.0, 1.08, E(t, a16, a17)), 540, 1000, TILT(t) * .5)}"><rect width="1080" height="1920" fill="#0d1014"/><rect width="1080" height="1920" fill="url(#flashC)"/>${ppl}</g>` };
   });
-  return { w: `<g transform="${cam(1.25, 540, 1000, TILT(t))}">${A.bgCorridor({ lamp: lampFlicker(t + 7) * .7 })}</g><rect width="1080" height="1920" fill="#000" opacity=".45"/>
-    <g transform="translate(540 860) rotate(${-2 + Math.sin(t) * .5}) scale(${lerp(2.9, 3.1, E(t, 65.8, 71.3))}) translate(-110 -150)">${A.poster()}</g>${notes}${dust(t)}` };
-});
-sc(71.35, 77.7, t => { // 18. свет везде, кроме нашего дома
-  const lx = lerp(-100, 1250, E(t, 72.8, 74.7));
-  const k = E(t, 76.3, 77.6);
-  return { w: `<g transform="${cam(lerp(1.0, 1.55, k), lerp(540, 640, k), lerp(960, 1250, k))}">${A.bgCity({ t, noRain: true, lightX: lx })}</g>${rainOverlay(t, .3)}${flash(t, 72.85, .5, '#f3dc96', .18)}` };
-});
-sc(77.7, 81, t => { // финальный титр
-  const k = E(t, 77.8, 78.4);
-  return { w: `<rect width="1080" height="1920" fill="#05070a"/>
-    <g opacity="${k}"><text x="540" y="860" text-anchor="middle" font-family="Inter" font-weight="900" font-size="150" letter-spacing="20" fill="#e6e1d3">ПОТОП</text>
-    <text x="540" y="960" text-anchor="middle" font-family="Inter" font-weight="700" font-size="50" fill="#ff5444">Серия 2 — скоро</text>
-    <text x="540" y="1060" text-anchor="middle" font-family="Inter" font-weight="600" font-size="38" fill="#7d8e9a">подпишись, чтобы не пропустить</text></g>
-    <text x="540" y="1760" text-anchor="middle" font-family="Inter" font-weight="800" font-size="40" fill="#9fb2bf" opacity="${k}">Решай сам</text>`, noSub: true, vig: .5 };
-});
+  // 14. Тишина, слышно сердце: крупный план Ильи на тёмном фоне, пульс в такт
+  sc(a17, a18, t => {
+    const tb = T(98), bt = ((t - tb) % .9 + .9) % .9, beat = t < tb ? 0 : Math.max(Math.exp(-Math.pow(bt / .07, 2)), .7 * Math.exp(-Math.pow((bt - .3) / .07, 2)));
+    const z = 3.5 * (1 + beat * .025) * lerp(1, 1.1, E(t, a17, a18));
+    return { w: `<rect width="1080" height="1920" fill="#0a0d11"/><circle cx="540" cy="900" r="620" fill="url(#flashC)" opacity="${.7 + beat * .3}"/>
+      <g transform="${cam(z, 540, 1670 - 300 * 2.05 + 20, TILT(t))}">${put(A.ilya({ blink: blinkAt(t, 2.9) }), 540, 1720, 2.05)}</g>
+      <rect width="1080" height="1920" fill="#6b0f0f" opacity="${beat * .22}"/>${dust(t, 14)}`, vig: 1 };
+  });
+  // 15. Почерк: две записки рядом, сканирующая линия
+  sc(a18, a19, t => {
+    const y = lerp(300, 1370, E(t, T(108), T(110) + .3));
+    return { w: `<rect width="1080" height="1920" fill="#10151b"/><rect width="1080" height="1920" fill="url(#lampR)" opacity=".5"/>
+      ${noteAt(540, 590, 4.0, -3)}${noteAt(540, 1130, 4.0, 3, ['Аня, к. 42', 'конспект'])}
+      <rect x="120" y="${y}" width="840" height="6" fill="#f2cf63" opacity="${E(t, T(108) - .1, T(108) + .1) * .7}"/>${dust(t, 14)}` };
+  });
+  // 16. Аня из 42-й: дверь 42, объявление «ПРОПАЛА» целиком
+  sc(a19, a20, t => {
+    const k = pop(t, T(113) - .15, .3);
+    return { w: `<g transform="${cam(lerp(1.17, 1.22, E(t, a19, a20)), 540, 880, TILT(t))}">${A.bgDoorClose({ n: 42, mode: 'bare', t })}</g>
+      <g transform="translate(540 930) scale(${k}) translate(-540 -930)"><g transform="translate(540 930) rotate(${-2 + Math.sin(t * 2) * .6}) scale(2.55) translate(-110 -150)"><g filter="url(#sh)">${A.poster()}</g></g></g>${dust(t, 12)}` };
+  });
+  // 17. Записки появлялись весь вечер — стопка крупных записок, всё в кадре
+  sc(a20, a21, t => {
+    const N = [[123, 316, 470, -5], [124, 764, 700, 4], [125, 316, 960, 4], [126, 764, 1190, -4]];
+    return { w: `<g transform="${cam(1.17, 540, 880, TILT(t))}">${A.bgDoorClose({ n: 41, mode: 'bare', t })}</g><rect width="1080" height="1920" fill="#000" opacity=".55"/>
+      ${N.map(([i, x, y, r]) => { const k = pop(t, T(i) - .05, .25); return k > 0 ? `<g transform="translate(${x} ${y}) scale(${k}) translate(${-x} ${-y})">${noteAt(x, y, 3.0, r)}</g>` : ''; }).join('')}${dust(t, 10)}` };
+  });
+  // 18. Город: свет везде, кроме нашего дома
+  sc(a21, VE, t => {
+    const lx = lerp(-100, 1250, E(t, T(132) - .4, T(132) + 1.6)), k = E(t, T(135) - .2, T(137) + .9);
+    return { w: `<g transform="${cam(lerp(1.0, 1.55, k), lerp(540, 640, k), lerp(960, 1250, k))}">${A.bgCity({ t, noRain: true, lightX: lx })}</g>${rainOverlay(t, .3)}${flash(t, T(132) - .35, .5, '#f3dc96', .18)}` };
+  });
+  // титр
+  sc(VE, 999, t => {
+    const k = E(t, VE + .1, VE + .6);
+    return { w: `<rect width="1080" height="1920" fill="#05070a"/><g opacity="${k}"><text x="540" y="860" text-anchor="middle" font-family="Inter" font-weight="900" font-size="150" letter-spacing="20" fill="#e6e1d3">ПОТОП</text>
+      <text x="540" y="960" text-anchor="middle" font-family="Inter" font-weight="700" font-size="50" fill="#ff5444">Серия 2 — скоро</text>
+      <text x="540" y="1060" text-anchor="middle" font-family="Inter" font-weight="600" font-size="38" fill="#7d8e9a">подпишись, чтобы не пропустить</text></g>
+      <text x="540" y="1760" text-anchor="middle" font-family="Inter" font-weight="800" font-size="40" fill="#9fb2bf" opacity="${k}">Решай сам</text>`, noSub: true, vig: .5 };
+  });
+}
 
 const DEFS = `<defs>
   <radialGradient id="vig" cx=".5" cy=".46" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".9"/></radialGradient>
@@ -218,6 +207,7 @@ const DEFS = `<defs>
   <radialGradient id="flashC" cx=".5" cy=".45" r=".6"><stop offset="0" stop-color="#f3dc96" stop-opacity=".25"/><stop offset="1" stop-color="#f3dc96" stop-opacity="0"/></radialGradient>
   <filter id="blur6" x="-1" y="-1" width="3" height="3"><feGaussianBlur stdDeviation="6"/></filter>
   <filter id="blur3" x="-.2" y="-.2" width="1.4" height="1.4"><feGaussianBlur stdDeviation="3"/></filter>
+  <filter id="sh" x="-10%" y="-10%" width="125%" height="130%"><feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#000" flood-opacity=".55"/></filter>
   <filter id="gray"><feColorMatrix type="saturate" values="0"/></filter></defs>`;
 
 function frame(t) {
@@ -227,7 +217,6 @@ function frame(t) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">${DEFS}${r.w}${vignette(r.vig ?? .85)}
     <rect width="1080" height="1920" fill="#000" opacity="${dip.toFixed(3)}"/>${r.noSub ? '' : subtitles(t)}</svg>`;
 }
-window.setup = raw => { WORDS = prepWords(raw); GROUPS = makeGroups(WORDS); return GROUPS.map(g => g.map(w => w.d).join(' ')); };
+window.setup = raw => { WORDS = prepWords(raw); GROUPS = makeGroups(WORDS); WM = {}; raw.forEach(w => WM[w.i] = w); buildScenes(); return GROUPS.map(g => g.map(w => w.d).join(' ')); };
 window.render = t => { document.getElementById('stage').innerHTML = frame(t); };
-window.DURATION = 80.5;
 </script></body></html>

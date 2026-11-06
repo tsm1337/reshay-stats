@@ -5,7 +5,7 @@ const [, , words, out, fpsA, wA] = process.argv; const fps = +fpsA || 30, W = +w
 fs.mkdirSync(out, { recursive: true });
 (async () => {
   const b = await chromium.launch(); const raw = JSON.parse(fs.readFileSync(words));
-  const p0 = await b.newPage(); await p0.goto('file://' + path.resolve(__dirname, 'animate.html')); const dur = await p0.evaluate(() => DURATION); await p0.close();
+  const p0 = await b.newPage(); await p0.goto('file://' + path.resolve(__dirname, 'animate.html')); const dur = await p0.evaluate(w => { setup(w); return DURATION; }, raw); await p0.close();
   const N = Math.round(dur * fps), per = Math.ceil(N / W); const t0 = Date.now();
   await Promise.all([...Array(W)].map(async (_, k) => {
     const p = await b.newPage({ viewport: { width: 1080, height: 1920 } }); p.on('pageerror', e => console.log('ERR', e.message));
