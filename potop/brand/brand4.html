@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Решай сам — неон</title>
+<style>html,body{margin:0;background:#000}svg{display:block}</style></head>
+<body><div id="stage"></div>
+<script>
+const I = 'font-family="Inter"';
+const PINK = '#ff2bd6', CYAN = '#22e6ff', PURP = '#8b3dff', YEL = '#ffe14d';
+const rng = s => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+const DEFS = `<defs>
+ <filter id="glow" filterUnits="userSpaceOnUse" x="-600" y="-600" width="4000" height="3000"><feGaussianBlur in="SourceGraphic" stdDeviation="5" result="a"/><feGaussianBlur in="SourceGraphic" stdDeviation="18" result="b"/><feGaussianBlur in="SourceGraphic" stdDeviation="46" result="c"/><feMerge><feMergeNode in="c"/><feMergeNode in="c"/><feMergeNode in="b"/><feMergeNode in="a"/></feMerge></filter>
+ <filter id="glowS" filterUnits="userSpaceOnUse" x="-600" y="-600" width="4000" height="3000"><feGaussianBlur in="SourceGraphic" stdDeviation="3" result="a"/><feGaussianBlur in="SourceGraphic" stdDeviation="10" result="b"/><feGaussianBlur in="SourceGraphic" stdDeviation="24" result="c"/><feMerge><feMergeNode in="c"/><feMergeNode in="b"/><feMergeNode in="a"/></feMerge></filter>
+ <filter id="blur4" filterUnits="userSpaceOnUse" x="-600" y="-600" width="4000" height="3000"><feGaussianBlur stdDeviation="4"/></filter>
+ <filter id="blur30" filterUnits="userSpaceOnUse" x="-600" y="-600" width="4000" height="3000"><feGaussianBlur stdDeviation="30"/></filter>
+ <radialGradient id="vig" cx=".5" cy=".5" r=".72"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".75"/></radialGradient></defs>`;
+// светящийся текст: ореол + цветная трубка + белая «раскалённая» середина
+const neonTxt = (txt, x, y, size, col, o = {}) => {
+  const a = `x="${x}" y="${y}" text-anchor="${o.anchor || 'middle'}" ${o.fam || I} font-weight="${o.w || 900}" font-size="${size}" ${o.tl ? `textLength="${o.tl}" lengthAdjust="spacing"` : ''}`;
+  const sw = o.sw || size * .035;
+  return `<g><g filter="url(#${o.f || 'glow'})"><text ${a} fill="${col}" fill-opacity=".35" stroke="${col}" stroke-width="${sw * 1.8}">${txt}</text></g>
+   <text ${a} fill="${col}" fill-opacity=".16" stroke="${col}" stroke-width="${sw}">${txt}</text>
+   <text ${a} fill="none" stroke="#fff" stroke-width="${sw * .4}" opacity=".95">${txt}</text></g>`;
+};
+const tube = (d, col, w = 14, f = 'glow') => `<g filter="url(#${f})"><path d="${d}" fill="none" stroke="${col}" stroke-width="${w * 1.6}" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></g><path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="#fff" stroke-width="${w * .38}" stroke-linecap="round" stroke-linejoin="round" opacity=".95"/>`;
+const svg = (W, H, b) => `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${DEFS}${b}</svg>`;
+const bokeh = (W, H, n, seed, cols, rmin = 8, rmax = 40, op = .5) => { const r = rng(seed); let s = ''; for (let i = 0; i < n; i++) { const c = cols[i % cols.length]; s += `<circle cx="${(r() * W).toFixed(0)}" cy="${(r() * H).toFixed(0)}" r="${(rmin + r() * (rmax - rmin)).toFixed(0)}" fill="${c}" opacity="${(op * (.3 + r() * .7)).toFixed(2)}"/>`; } return `<g filter="url(#blur4)">${s}</g>`; };
+const stars = (W, H, n, seed, hmax) => { const r = rng(seed); let s = ''; for (let i = 0; i < n; i++) s += `<circle cx="${(r() * W).toFixed(0)}" cy="${(r() * hmax).toFixed(0)}" r="${(1 + r() * 2.2).toFixed(1)}" fill="#fff" opacity="${(.2 + r() * .7).toFixed(2)}"/>`; return s; };
+
+// ===== A. Неоновая вывеска на кирпичной стене =====
+const brick = (id) => `<pattern id="${id}" width="180" height="90" patternUnits="userSpaceOnUse"><rect width="180" height="90" fill="#1a1016"/><rect x="3" y="3" width="84" height="40" fill="#241720"/><rect x="93" y="3" width="84" height="40" fill="#20141c"/><rect x="-42" y="48" width="84" height="40" fill="#22161e"/><rect x="48" y="48" width="84" height="40" fill="#261822"/><rect x="138" y="48" width="84" height="40" fill="#20141c"/></pattern>`;
+const A = {
+  banner: () => svg(2560, 1440, `<defs>${brick('br')}<radialGradient id="spA"><stop offset="0" stop-color="${PINK}" stop-opacity=".55"/><stop offset="1" stop-color="${PINK}" stop-opacity="0"/></radialGradient><radialGradient id="spB"><stop offset="0" stop-color="${CYAN}" stop-opacity=".5"/><stop offset="1" stop-color="${CYAN}" stop-opacity="0"/></radialGradient></defs>
+    <rect width="2560" height="1440" fill="url(#br)"/>
+    <ellipse cx="900" cy="720" rx="900" ry="520" fill="url(#spB)"/><ellipse cx="1700" cy="720" rx="800" ry="520" fill="url(#spA)"/>
+    <rect width="2560" height="1440" fill="url(#vig)"/>
+    ${tube('M100 1190 H400 Q470 1190 520 1140 L690 975', CYAN, 16)}${tube('M400 1190 Q470 1190 520 1240 L690 1400', PINK, 16)}${tube('M2460 290 H2200 Q2140 290 2090 340 L1960 470', PINK, 16)}${tube('M2200 290 Q2140 290 2090 240 L1960 110', CYAN, 16)}
+    ${neonTxt('РЕШАЙ', 530, 735, 215, CYAN, { anchor: 'start', tl: 800 })}${neonTxt('САМ', 1470, 735, 215, PINK, { anchor: 'start', tl: 560 })}
+    <rect x="720" y="800" width="1120" height="104" rx="52" fill="none" stroke="${YEL}" stroke-width="9" filter="url(#glowS)"/><rect x="720" y="800" width="1120" height="104" rx="52" fill="none" stroke="${YEL}" stroke-width="9"/><rect x="720" y="800" width="1120" height="104" rx="52" fill="none" stroke="#fff" stroke-width="3" opacity=".9"/>
+    ${neonTxt('СЕРИАЛЫ, ГДЕ РЕШАЕШЬ ТЫ', 1280, 876, 56, '#fff', { w: 800, tl: 1000, f: 'glowS', sw: 1.2 })}
+    ${bokeh(2560, 1440, 14, 3, [PINK, CYAN], 6, 20, .35)}`),
+  avatar: () => svg(800, 800, `<defs>${brick('br')}<radialGradient id="spA"><stop offset="0" stop-color="${PINK}" stop-opacity=".5"/><stop offset="1" stop-color="${PINK}" stop-opacity="0"/></radialGradient></defs>
+    <rect width="800" height="800" fill="url(#br)"/><circle cx="400" cy="400" r="380" fill="url(#spA)"/><rect width="800" height="800" fill="url(#vig)"/>
+    <circle cx="400" cy="400" r="290" fill="none" stroke="${PINK}" stroke-width="22" filter="url(#glow)"/><circle cx="400" cy="400" r="290" fill="none" stroke="${PINK}" stroke-width="20"/><circle cx="400" cy="400" r="290" fill="none" stroke="#fff" stroke-width="7" opacity=".9"/>
+    ${neonTxt('?', 400, 545, 440, CYAN, { sw: 14 })}`),
+};
+
+// ===== B. Киберпанк-улица под дождём, с отражением =====
+const city = (W, base, seed, hmin, hmax) => { const r = rng(seed); let b = '', n = '', x = -20; while (x < W) { const w = 90 + r() * 170, h = hmin + r() * (hmax - hmin); b += `<rect x="${x.toFixed(0)}" y="${(base - h).toFixed(0)}" width="${w.toFixed(0)}" height="${h.toFixed(0)}" fill="${['#0a0b1f', '#0d0a22', '#090c1c'][(r() * 3) | 0]}"/>`;
+  for (let k = 0; k < 6; k++) if (r() < .5) { const c = [PINK, CYAN, PURP, YEL][(r() * 4) | 0]; n += `<rect x="${(x + 10 + r() * (w - 30)).toFixed(0)}" y="${(base - h + 20 + r() * (h - 60)).toFixed(0)}" width="${(6 + r() * 8).toFixed(0)}" height="${(60 + r() * 140).toFixed(0)}" fill="${c}"/>`; }
+  for (let yy = base - h + 30; yy < base - 20; yy += 36) for (let xx = x + 14; xx < x + w - 18; xx += 26) if (r() < .22) n += `<rect x="${xx.toFixed(0)}" y="${yy.toFixed(0)}" width="12" height="16" fill="${r() < .5 ? '#ffd9a0' : CYAN}" opacity=".8"/>`;
+  x += w + 6; } return { b, n }; };
+const B = {
+  banner: () => { const base = 1000, c = city(2560, base, 21, 260, 640); const sc = `<g>${c.b}<g filter="url(#glowS)">${c.n}</g>${c.n}</g>`;
+    const r = rng(8); let rain = ''; for (let i = 0; i < 220; i++) { const x = r() * 2600, y = r() * 1440, l = 50 + r() * 90; rain += `M${x.toFixed(0)} ${y.toFixed(0)} l${(-l * .16).toFixed(0)} ${l.toFixed(0)} `; }
+    return svg(2560, 1440, `<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05030f"/><stop offset=".7" stop-color="#2a0f4a"/><stop offset="1" stop-color="#5a1a73"/></linearGradient><linearGradient id="hz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05030f" stop-opacity="0"/><stop offset="1" stop-color="#ff2bd6" stop-opacity=".35"/></linearGradient><linearGradient id="fl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a0a2e" stop-opacity=".2"/><stop offset="1" stop-color="#05030f" stop-opacity=".95"/></linearGradient></defs>
+      <rect width="2560" height="1440" fill="url(#sk)"/>${stars(2560, 1440, 70, 4, 500)}
+      <g opacity=".95">${sc}</g><rect x="0" y="300" width="2560" height="700" fill="url(#hz)"/>
+      <rect x="0" y="${base}" width="2560" height="440" fill="#0b0618"/>
+      <g transform="translate(0 ${2 * base}) scale(1 -1)" opacity=".4" filter="url(#blur4)">${sc}</g>
+      <rect x="0" y="${base}" width="2560" height="440" fill="url(#fl)"/>
+      <ellipse cx="1280" cy="${base + 60}" rx="900" ry="60" fill="${PINK}" opacity=".18" filter="url(#blur30)"/>
+      <path d="${rain}" stroke="#bfe9ff" stroke-width="2" opacity=".22"/>
+      ${neonTxt('РЕШАЙ', 530, 725, 215, CYAN, { anchor: 'start', tl: 800 })}${neonTxt('САМ', 1470, 725, 215, PINK, { anchor: 'start', tl: 560 })}
+      ${`<rect x="700" y="786" width="1160" height="96" rx="48" fill="#05030f" opacity=".7"/>`+neonTxt('СЕРИАЛЫ, ГДЕ РЕШАЕШЬ ТЫ', 1280, 856, 56, '#fff', { w: 800, tl: 1000, f: 'glowS', sw: 1.3 })}
+      ${bokeh(2560, 1440, 22, 6, [PINK, CYAN, PURP], 8, 30, .35)}<rect width="2560" height="1440" fill="url(#vig)"/>`); },
+  avatar: () => { const base = 560, c = city(800, base, 33, 160, 400);
+    return svg(800, 800, `<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05030f"/><stop offset="1" stop-color="#5a1a73"/></linearGradient></defs><rect width="800" height="800" fill="url(#sk)"/>
+      <g opacity=".6">${c.b}<g filter="url(#glowS)">${c.n}</g>${c.n}</g><rect x="0" y="${base}" width="800" height="240" fill="#0b0618" opacity=".9"/>
+      ${bokeh(800, 800, 14, 5, [PINK, CYAN], 10, 34, .4)}${neonTxt('?', 400, 560, 560, PINK, { sw: 18 })}<rect width="800" height="800" fill="url(#vig)"/>`); },
+};
+
+// ===== C. Неоновая развилка (дорога расходится в две стороны) =====
+const C = {
+  banner: () => svg(2560, 1440, `<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#06031a"/><stop offset=".62" stop-color="#2a0c55"/><stop offset="1" stop-color="#0a0420"/></linearGradient><radialGradient id="sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="${PINK}" stop-opacity=".75"/><stop offset=".5" stop-color="${PURP}" stop-opacity=".35"/><stop offset="1" stop-color="${PURP}" stop-opacity="0"/></radialGradient></defs>
+    <rect width="2560" height="1440" fill="url(#sk)"/>${stars(2560, 1440, 120, 9, 900)}
+    <ellipse cx="1280" cy="800" rx="1100" ry="520" fill="url(#sun)"/>
+    <rect x="0" y="940" width="2560" height="500" fill="#07031a"/><rect x="0" y="940" width="2560" height="6" fill="${CYAN}" filter="url(#glowS)"/>
+    ${Array.from({ length: 9 }, (_, i) => `<path d="M0 ${940 + Math.pow(i + 1, 2) * 6} H2560" stroke="${PURP}" stroke-width="2" opacity=".5"/>`).join('')}
+    ${tube('M1280 1440 V1230 Q1280 1110 1180 1050 L720 944', CYAN, 18)}${tube('M1280 1230 Q1280 1110 1380 1050 L1840 944', PINK, 18)}
+    ${tube('M720 944 l-70 4 M720 944 l30 60', CYAN, 18)}${tube('M1840 944 l70 4 M1840 944 l-30 60', PINK, 18)}
+    ${neonTxt('РЕШАЙ', 530, 735, 215, CYAN, { anchor: 'start', tl: 800 })}${neonTxt('САМ', 1470, 735, 215, PINK, { anchor: 'start', tl: 560 })}
+    ${neonTxt('СЕРИАЛЫ, ГДЕ РЕШАЕШЬ ТЫ', 1280, 850, 58, '#fff', { w: 800, tl: 1050, f: 'glowS', sw: 1.4 })}
+    ${bokeh(2560, 1440, 16, 2, [PINK, CYAN], 6, 22, .4)}<rect width="2560" height="1440" fill="url(#vig)"/>`),
+  avatar: () => svg(800, 800, `<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#06031a"/><stop offset="1" stop-color="#2a0c55"/></linearGradient><radialGradient id="sun" cx=".5" cy=".4" r=".55"><stop offset="0" stop-color="${PINK}" stop-opacity=".6"/><stop offset="1" stop-color="${PURP}" stop-opacity="0"/></radialGradient></defs>
+    <rect width="800" height="800" fill="url(#sk)"/><rect width="800" height="800" fill="url(#sun)"/>${stars(800, 800, 40, 7, 800)}
+    ${tube('M400 640 V470 Q400 410 350 370 L230 250', CYAN, 30)}${tube('M400 470 Q400 410 450 370 L570 250', PINK, 30)}${tube('M180 380 V230 H330', CYAN, 30)}${tube('M620 380 V230 H470', PINK, 30)}
+    <circle cx="400" cy="680" r="26" fill="#fff" filter="url(#glowS)"/><rect width="800" height="800" fill="url(#vig)"/>`),
+};
+
+// ===== D. Неоновый портал из колец =====
+const rings = (cx, cy, rx, ry, n, rad) => Array.from({ length: n }, (_, i) => { const k = 1 - i / n, col = [PINK, PURP, CYAN][i % 3]; return tube(`M${cx - rx * k} ${cy} a${rx * k} ${ry * k} 0 1 0 ${2 * rx * k} 0 a${rx * k} ${ry * k} 0 1 0 ${-2 * rx * k} 0Z`.replace(/a(\S+) (\S+) 0 1 0/g, (m, a, b) => `a${a} ${b} 0 1 0`), col, 5 + k * 6, 'glowS'); }).join('');
+const D = {
+  banner: () => svg(2560, 1440, `<defs><radialGradient id="bg" cx=".5" cy=".5" r=".7"><stop offset="0" stop-color="#2a0b57"/><stop offset="1" stop-color="#05020f"/></radialGradient></defs>
+    <rect width="2560" height="1440" fill="url(#bg)"/>${stars(2560, 1440, 100, 12, 1440)}
+    ${rings(1280, 720, 1200, 330, 9)}
+    <ellipse cx="1280" cy="720" rx="900" ry="200" fill="#05020f" opacity=".8" filter="url(#blur30)"/>
+    ${neonTxt('РЕШАЙ', 530, 745, 215, CYAN, { anchor: 'start', tl: 800 })}${neonTxt('САМ', 1470, 745, 215, PINK, { anchor: 'start', tl: 560 })}
+    ${neonTxt('СЕРИАЛЫ, ГДЕ РЕШАЕШЬ ТЫ', 1280, 860, 56, '#fff', { w: 800, tl: 1000, f: 'glowS', sw: 1.3 })}
+    ${bokeh(2560, 1440, 14, 4, [PINK, CYAN], 6, 22, .35)}<rect width="2560" height="1440" fill="url(#vig)"/>`),
+  avatar: () => svg(800, 800, `<defs><radialGradient id="bg" cx=".5" cy=".5" r=".7"><stop offset="0" stop-color="#2a0b57"/><stop offset="1" stop-color="#05020f"/></radialGradient></defs><rect width="800" height="800" fill="url(#bg)"/>
+    ${[0, 1, 2, 3, 4].map(i => { const r = 350 - i * 62, c = [PINK, PURP, CYAN][i % 3]; return tube(`M${400 - r} 400 a${r} ${r} 0 1 0 ${2 * r} 0 a${r} ${r} 0 1 0 ${-2 * r} 0Z`, c, 10 + (4 - i) * 1.5, 'glowS'); }).join('')}
+    ${neonTxt('?', 400, 500, 300, '#fff', { sw: 10, f: 'glowS' })}<rect width="800" height="800" fill="url(#vig)"/>`),
+};
+
+const V = { A, B, C, D }, q = new URLSearchParams(location.search);
+document.getElementById('stage').innerHTML = V[q.get('v') || 'A'][q.get('m') === 'banner' ? 'banner' : 'avatar']();
+</script></body></html>
