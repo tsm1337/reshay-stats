@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>ПОТОП — лист</title>
+<style>
+  body{margin:0;background:#07090c;color:#cfd6dc;font-family:Inter,sans-serif}
+  #root{width:2000px;padding:50px;box-sizing:border-box}
+  h1{margin:0 0 6px;font-weight:900;font-size:64px;letter-spacing:4px;color:#e6e1d3}
+  h1 span{color:#d0473b}
+  .sub{color:#7d8e9a;font-size:22px;margin-bottom:30px}
+  h2{font-size:26px;font-weight:800;letter-spacing:2px;color:#9fb2bf;margin:34px 0 14px;text-transform:uppercase}
+  .row{display:flex;gap:22px;flex-wrap:wrap}
+  .card{background:#10151b;border:1px solid #1e262e;border-radius:14px;padding:12px;text-align:center}
+  .card b{display:block;font-size:22px;color:#e6e1d3;margin-top:6px}
+  .card i{display:block;font-style:normal;font-size:16px;color:#7d8e9a;margin-top:2px}
+  .pal{display:flex;gap:10px}.sw{width:90px;height:60px;border-radius:8px;font-size:13px;display:flex;align-items:flex-end;padding:4px;box-sizing:border-box;color:#fff;text-shadow:0 1px 2px #000}
+</style></head>
+<body><div id="root"></div>
+<svg width="0" height="0" style="position:absolute"><filter id="gray"><feColorMatrix type="saturate" values="0"/></filter></svg>
+<script src="assets.js"></script>
+<script>
+const A = POTOP, P = A.P;
+const sv = (w, h, vb, inner) => `<svg width="${w}" height="${h}" viewBox="${vb}">${inner}</svg>`;
+const card = (svg, name, desc) => `<div class="card">${svg}<b>${name}</b><i>${desc}</i></div>`;
+const chars = [
+  [A.ilya(), 'Илья, 23', 'стример · болен · свисток'],
+  [A.vera(), 'Вера', 'попутчица из поезда'],
+  [A.anya(), 'Аня, к. 42', 'пропала · пишет записки'],
+  [`<g transform="translate(0 200)">${A.cat()}</g>`, 'Кот', 'на крыше машины'],
+  [`<g transform="translate(-55 0) scale(.95)">${A.neighbor(0)}</g><g transform="translate(55 10) scale(.92)">${A.neighbor(1)}</g>`, 'Соседи ×10', 'силуэты на лестнице'],
+].map(([s, n, d]) => card(sv(260, 400, '-30 0 260 400', s), n, d)).join('');
+const props = [
+  [A.clock(), '0 0 260 110', 'Часы 21:14'],
+  [A.phone(), '-20 0 190 290', 'Телефон'],
+  [A.note(), '-10 -10 200 140', 'Записка'],
+  [A.poster(), '0 0 220 300', 'Объявление'],
+  [A.whistle(), '-60 -30 190 100', 'Свисток'],
+  [A.pills(), '-10 -10 140 90', 'Таблетки'],
+].map(([s, vb, n]) => card(sv(230, 200, vb, s), n, '')).join('');
+const bgs = [
+  [A.bgFlood(), 'Окно: улица-море', 'сц. 1–3'],
+  [A.bgCorridor(), 'Коридор общаги', 'сц. 4–10, 16'],
+  [A.bgBasement(), 'Подвал, кодовая дверь', 'сц. 11–12'],
+  [A.bgBoat(), 'Лодка за дверью', 'сц. 13–15'],
+  [A.bgCity(), 'Город: свет, кроме нас', 'сц. 17–18'],
+].map(([s, n, d]) => card(sv(330, 587, '0 0 1080 1920', s), n, d)).join('');
+const pal = [['#0a1018','ночь'],['#12303b','вода'],['#232d37','стены'],['#3a2f28','двери'],['#e8c76a','лампа'],['#d0473b','тревога'],['#7fd1d9','блик'],['#a8842f','Вера'],['#3d4d55','Илья'],['#e6e1d3','бумага']]
+  .map(([c, n]) => `<div class="sw" style="background:${c}">${n}</div>`).join('');
+document.getElementById('root').innerHTML = `
+  <h1>ПОТОП <span>·</span> серия 1 «Последний в доме»</h1>
+  <div class="sub">Лист персонажей и фонов · плоский 2D · кадр 1080×1920</div>
+  <h2>Персонажи</h2><div class="row">${chars}</div>
+  <h2>Реквизит</h2><div class="row">${props}</div>
+  <h2>Фоны (9:16)</h2><div class="row">${bgs}</div>
+  <h2>Палитра</h2><div class="pal">${pal}</div>`;
+</script></body></html>
