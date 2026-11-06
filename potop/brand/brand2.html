@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Решай сам — варианты</title>
+<style>html,body{margin:0;background:#000}svg{display:block}</style></head>
+<body><div id="stage"></div>
+<script>
+const F = 'font-family="Inter"';
+const dots = (id, bg, dot, s = 26, r = 5) => `<pattern id="${id}" width="${s}" height="${s}" patternUnits="userSpaceOnUse" patternTransform="rotate(20)"><rect width="${s}" height="${s}" fill="${bg}"/><circle cx="${s / 2}" cy="${s / 2}" r="${r}" fill="${dot}"/></pattern>`;
+const arrow = (pts, col, w) => `<path d="${pts}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+
+// ---------- Вариант 1: красный / синий, разрез по диагонали, большой знак вопроса ----------
+const V1 = {
+  avatar: `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+    <rect width="800" height="800" fill="#2457ff"/><polygon points="0,0 800,0 0,800" fill="#ff3b4e"/>
+    <path d="M800 0 L0 800" stroke="#fff" stroke-width="14" stroke-dasharray="6 28" stroke-linecap="round"/>
+    <text x="408" y="580" text-anchor="middle" ${F} font-weight="900" font-size="560" fill="#0d1230" opacity=".35">?</text>
+    <text x="400" y="565" text-anchor="middle" ${F} font-weight="900" font-size="560" fill="#fff">?</text></svg>`,
+  banner: `<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="1440" viewBox="0 0 2560 1440">
+    <rect width="2560" height="1440" fill="#2457ff"/><polygon points="0,0 1800,0 760,1440 0,1440" fill="#ff3b4e"/>
+    <path d="M1800 0 L760 1440" stroke="#fff" stroke-width="12" stroke-dasharray="4 30" stroke-linecap="round"/>
+    <text x="190" y="1180" ${F} font-weight="900" font-size="900" fill="#fff" opacity=".12">?</text>
+    <text x="2060" y="1240" ${F} font-weight="900" font-size="900" fill="#fff" opacity=".12">?</text>
+    <text x="1286" y="736" text-anchor="middle" ${F} font-weight="900" font-size="210" letter-spacing="8" fill="#0d1230" opacity=".4">РЕШАЙ САМ</text>
+    <text x="1280" y="722" text-anchor="middle" ${F} font-weight="900" font-size="210" letter-spacing="8" fill="#fff">РЕШАЙ САМ</text>
+    <rect x="780" y="790" width="1000" height="104" rx="52" fill="#fff"/>
+    <text x="1280" y="864" text-anchor="middle" ${F} font-weight="800" font-size="56" letter-spacing="4" fill="#0d1230">СЕРИАЛЫ, ГДЕ РЕШАЕШЬ ТЫ</text></svg>`,
+};
+
+// ---------- Вариант 2: комикс, жёлтый с растром, чёрные контуры, кнопки ДА / НЕТ ----------
+const burst = (cx, cy, R, r, n) => Array.from({ length: n * 2 }, (_, i) => { const a = i * Math.PI / n, k = i % 2 ? r : R; return `${(cx + Math.cos(a) * k).toFixed(0)},${(cy + Math.sin(a) * k).toFixed(0)}`; }).join(' ');
+const V2 = {
+  avatar: `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800"><defs>${dots('d', '#ffd23f', '#f4b400', 30, 6)}</defs>
+    <rect width="800" height="800" fill="url(#d)"/>
+    <polygon points="${burst(400, 400, 370, 270, 12)}" fill="#fff" stroke="#111" stroke-width="16" stroke-linejoin="round"/>
+    <text x="412" y="528" text-anchor="middle" ${F} font-weight="900" font-size="380" fill="#111">?!</text>
+    <text x="400" y="516" text-anchor="middle" ${F} font-weight="900" font-size="380" fill="#ff3b4e" stroke="#111" stroke-width="14" paint-order="stroke">?!</text></svg>`,
+  banner: `<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="1440" viewBox="0 0 2560 1440"><defs>${dots('d', '#ffd23f', '#f4b400', 34, 7)}</defs>
+    <rect width="2560" height="1440" fill="url(#d)"/>
+    <polygon transform="translate(1280 720) scale(1.62 .8) translate(-1280 -720)" points="${burst(1280, 720, 800, 600, 16)}" fill="#fff" stroke="#111" stroke-width="18" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <text x="1296" y="760" text-anchor="middle" ${F} font-weight="900" font-size="190" letter-spacing="4" fill="#111">РЕШАЙ САМ</text>
+    <text x="1280" y="744" text-anchor="middle" ${F} font-weight="900" font-size="190" letter-spacing="4" fill="#ff3b4e" stroke="#111" stroke-width="16" paint-order="stroke">РЕШАЙ САМ</text>
+    <text x="1280" y="860" text-anchor="middle" ${F} font-weight="900" font-size="58" letter-spacing="3" fill="#111">СЕРИАЛЫ, ГДЕ РЕШАЕШЬ ТЫ!</text>
+    <g transform="rotate(-8 280 720)"><rect x="110" y="590" width="340" height="260" rx="40" fill="#25c26e" stroke="#111" stroke-width="16"/><text x="280" y="765" text-anchor="middle" ${F} font-weight="900" font-size="150" fill="#fff" stroke="#111" stroke-width="12" paint-order="stroke">ДА</text></g>
+    <g transform="rotate(8 2280 720)"><rect x="2110" y="590" width="340" height="260" rx="40" fill="#ff3b4e" stroke="#111" stroke-width="16"/><text x="2280" y="765" text-anchor="middle" ${F} font-weight="900" font-size="150" fill="#fff" stroke="#111" stroke-width="12" paint-order="stroke">НЕТ</text></g></svg>`,
+};
+
+// ---------- Вариант 3: светлый минимализм, развилка из стрелок ----------
+const V3 = {
+  avatar: `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+    <rect width="800" height="800" fill="#f5f0e8"/>
+    ${arrow('M400 690 V470 Q400 400 340 350 L230 260', '#ff6b2c', 72)}${arrow('M400 470 Q400 400 460 350 L570 260', '#14b8a6', 72)}
+    ${arrow('M170 360 V230 H300', '#ff6b2c', 72)}${arrow('M630 360 V230 H500', '#14b8a6', 72)}
+    <circle cx="400" cy="700" r="46" fill="#14141a"/></svg>`,
+  banner: `<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="1440" viewBox="0 0 2560 1440">
+    <rect width="2560" height="1440" fill="#f5f0e8"/>
+    <g transform="translate(50 88) scale(.62)">${arrow('M20 1020 H330 Q420 1020 480 960 L640 800', '#ff6b2c', 60)}${arrow('M330 1020 Q420 1020 480 1080 L640 1240', '#14b8a6', 60)}${arrow('M520 800 H640 V920', '#ff6b2c', 60)}${arrow('M520 1240 H640 V1120', '#14b8a6', 60)}</g>
+    <g transform="translate(2510 88) scale(-.62 .62)">${arrow('M20 1020 H330 Q420 1020 480 960 L640 800', '#ff6b2c', 60)}${arrow('M330 1020 Q420 1020 480 1080 L640 1240', '#14b8a6', 60)}${arrow('M520 800 H640 V920', '#ff6b2c', 60)}${arrow('M520 1240 H640 V1120', '#14b8a6', 60)}</g>
+    <text x="1280" y="722" text-anchor="middle" ${F} font-weight="900" font-size="215" letter-spacing="4" fill="#14141a">РЕШАЙ <tspan fill="#ff6b2c">САМ</tspan></text>
+    <text x="1280" y="842" text-anchor="middle" ${F} font-weight="700" font-size="64" letter-spacing="6" fill="#5a5a66">сериалы, где решаешь ты</text></svg>`,
+};
+
+const q = new URLSearchParams(location.search), v = { 1: V1, 2: V2, 3: V3 }[q.get('v') || 1], m = q.get('m') || 'avatar';
+document.getElementById('stage').innerHTML = v[m];
+</script></body></html>
