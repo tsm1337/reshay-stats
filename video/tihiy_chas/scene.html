@@ -1,0 +1,98 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#0b1020;font-family:'Inter','DejaVu Sans',sans-serif}
+#st{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#sub{position:absolute;left:40px;width:1000px;top:1400px;height:230px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;font-size:100px;white-space:nowrap;line-height:1.05;color:#fff;text-transform:uppercase;letter-spacing:-2px;text-shadow:0 6px 0 #000,0 0 24px rgba(0,0,0,.8);-webkit-text-stroke:8px #0b1020;paint-order:stroke fill}
+#sub span.k{color:#ffd23f}#sub span.r{color:#ff4d5e}#sub span.g{color:#3ddc84}
+</style></head><body>
+<svg id="st" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#141a3a"/><stop offset="1" stop-color="#070a16"/></linearGradient>
+<radialGradient id="glow"><stop offset="0" stop-color="#3ddc84" stop-opacity=".35"/><stop offset="1" stop-color="#3ddc84" stop-opacity="0"/></radialGradient>
+<radialGradient id="rglow"><stop offset="0" stop-color="#ff4d5e" stop-opacity=".45"/><stop offset="1" stop-color="#ff4d5e" stop-opacity="0"/></radialGradient>
+<linearGradient id="ph" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a3263"/><stop offset="1" stop-color="#171c3c"/></linearGradient>
+<clipPath id="scr"><rect x="270" y="500" width="540" height="860" rx="44"/></clipPath>
+</defs>
+<rect width="1080" height="1920" fill="url(#bg)"/>
+<circle id="g1" cx="540" cy="400" r="520" fill="url(#glow)"/>
+<circle id="g2" cx="540" cy="900" r="620" fill="url(#rglow)" opacity="0"/>
+<!-- tag -->
+<g id="tag"><rect x="300" y="86" width="480" height="76" rx="38" fill="#ffd23f"/><text x="540" y="138" text-anchor="middle" font-size="40" font-weight="900" fill="#0b1020" letter-spacing="2">ЧТО БЫ ТЫ СДЕЛАЛ?</text></g>
+<!-- prize -->
+<g id="prize"><text id="pz" x="540" y="320" text-anchor="middle" font-size="150" font-weight="900" fill="#3ddc84">5 000 ₽</text></g>
+<!-- timer -->
+<g id="timer"><rect x="290" y="350" width="500" height="130" rx="30" fill="#0b1020" stroke="#3ddc84" stroke-width="6" id="tbox"/>
+<text id="tt" x="540" y="445" text-anchor="middle" font-family="DejaVu Sans Mono" font-size="104" font-weight="700" fill="#fff">60:00</text></g>
+<!-- phone -->
+<g id="phone"><rect x="250" y="480" width="580" height="900" rx="70" fill="url(#ph)" stroke="#4a5499" stroke-width="8"/>
+<rect x="270" y="500" width="540" height="860" rx="52" fill="#0d1130"/>
+<rect x="470" y="515" width="140" height="26" rx="13" fill="#05070f"/>
+<g clip-path="url(#scr)" id="msgs"></g>
+<g id="lock"><circle cx="540" cy="930" r="110" fill="#1b2150" stroke="#3ddc84" stroke-width="8"/><rect x="490" y="925" width="100" height="78" rx="14" fill="#3ddc84"/><path d="M510 925v-28a30 30 0 0 1 60 0v28" fill="none" stroke="#3ddc84" stroke-width="16" stroke-linecap="round"/><rect x="532" y="950" width="16" height="30" rx="6" fill="#0b1020"/></g></g>
+<!-- options -->
+<g id="o1" opacity="0"><rect x="60" y="1480" width="460" height="260" rx="40" fill="#123d2a" stroke="#3ddc84" stroke-width="8"/><circle cx="130" cy="1550" r="44" fill="#3ddc84"/><text x="130" y="1568" text-anchor="middle" font-size="56" font-weight="900" fill="#0b1020">1</text><text x="290" y="1640" text-anchor="middle" font-size="46" font-weight="900" fill="#fff">ЗАБРАТЬ</text><text x="290" y="1700" text-anchor="middle" font-size="56" font-weight="900" fill="#3ddc84">5 000 ₽</text></g>
+<g id="o2" opacity="0"><rect x="560" y="1480" width="460" height="260" rx="40" fill="#45141c" stroke="#ff4d5e" stroke-width="8"/><circle cx="630" cy="1550" r="44" fill="#ff4d5e"/><text x="630" y="1568" text-anchor="middle" font-size="56" font-weight="900" fill="#0b1020">2</text><text x="790" y="1640" text-anchor="middle" font-size="46" font-weight="900" fill="#fff">ПОЗВОНИТЬ</text><text x="790" y="1700" text-anchor="middle" font-size="56" font-weight="900" fill="#ff4d5e">МАМЕ</text></g>
+<text id="hand" x="540" y="1860" text-anchor="middle" font-size="34" font-weight="700" fill="#6c76b5">@reshay_sam_serial</text>
+</svg>
+<div id="sub"><div id="si"></div></div>
+<script>
+const D=__DATA__;
+const W=D.words,S=D.sent.map(a=>a[1]),T=D.total;
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const ease=x=>1-Math.pow(1-cl(x),3);
+const st=i=>S[i]; // sentence start
+const sEnd=i=>D.sent[i][1]+D.sent[i][2];
+// subtitle chunks
+const KEY=/тысяч|телефон|срочно|мам|сорок|час$|первое|второе|один|два|сделал|таймер|рублей|пять/i;
+const RED=/срочно|мам/i,GRN=/тысяч|рублей|пять|забрать|дождаться/i;
+const chunks=[];let cur=[];
+const flush=()=>{if(cur.length){chunks.push({t:cur[0].t,e:cur[cur.length-1].t+cur[cur.length-1].d,w:cur});cur=[]}};
+W.forEach((w,i)=>{const n=W[i+1];cur.push(w);
+ const len=cur.map(x=>x.w).join(' ').length;
+ const brk=!n||n.s!==w.s||cur.length>=3||len>13||(cur.length>=2&&KEY.test(w.w));
+ if(brk)flush();});
+function esc(s){return s.replace(/[.,:!?]/g,'')}
+function subHTML(c){return c.w.map(x=>{const t=esc(x.w);const cls=RED.test(t)?'r':GRN.test(t)?'g':KEY.test(t)?'k':'';return cls?`<span class="${cls}">${t}</span>`:t}).join(' ')}
+const MSG=[["Лена","ты где? ответь"],["Банк","Списание 890 ₽"],["Работа","срочно по проекту"],["Курьер","Ваш заказ у двери"]];
+const mk=(i,y,col,name,txt,sc)=>`<g transform="translate(0,${y}) translate(540 0) scale(${sc}) translate(-540 0)"><rect x="290" y="0" width="500" height="130" rx="26" fill="${col}" /><circle cx="345" cy="65" r="30" fill="#ffffff22"/><text x="395" y="52" font-size="30" font-weight="900" fill="#fff">${name}</text><text x="395" y="96" font-size="32" font-weight="700" fill="#ffffffcc">${txt}</text></g>`;
+function draw(t){
+ // timer
+ const t2=st(2),t5=D.words.find(w=>w.s===5&&/сорок/i.test(w.w));const t5e=t5?t5.t+t5.d:sEnd(5);
+ let rem=3600;
+ if(t>=t2){rem=3599-(3599-2400)*ease((t-t2)/(t5e-t2));}
+ if(t>=t5e)rem=2400;
+ const mm=String(Math.floor(rem/60)).padStart(2,'0'),ss=String(Math.floor(rem%60)).padStart(2,'0');
+ $('tt').textContent=mm+':'+ss;
+ const late=t>=st(4);
+ $('tbox').setAttribute('stroke',late?'#ff4d5e':'#3ddc84');
+ $('tt').setAttribute('fill',late?'#ff8a96':'#fff');
+ // intro pop
+ const p=ease(t/0.5);$('prize').setAttribute('transform',`translate(540 250) scale(${0.6+0.4*p}) translate(-540 -250)`);$('prize').setAttribute('opacity',p);
+ $('timer').setAttribute('opacity',ease((t-0.4)/0.4));
+ // lock fades when timer starts
+ $('lock').setAttribute('opacity',ease((t-st(1))/0.3)*(1-ease((t-t2)/0.4)));
+ $('phone').setAttribute('opacity',ease((t-0.2)/0.5));
+ // messages
+ let h='';
+ const m0=st(3);
+ MSG.forEach((m,i)=>{const a=ease((t-(m0+i*0.45))/0.3);if(a<=0||t>=st(4)+0.01&&false)return;
+   const y=560+i*150+(1-a)*80;const out=ease((t-st(4))/0.4);
+   h+=`<g opacity="${a*(1-0.65*out)}">`+mk(i,y,'#262d63',m[0],m[1],0.6+0.4*a)+'</g>';});
+ const ma=ease((t-st(4)-0.25)/0.25);
+ if(ma>0){const sh=t<st(4)+1.6?Math.sin(t*60)*8*(1-cl((t-st(4)-0.5)/1.1)):0;
+  h+=`<g transform="translate(${sh},0)" opacity="${ma}">`+mk(9,780+(1-ma)*60,'#e0243a','МАМА','позвони срочно!',1+0.06*Math.sin(t*10))+'<circle cx="790" cy="780" r="22" fill="#ffd23f"/><text x="790" y="789" text-anchor="middle" font-size="26" font-weight="900" fill="#0b1020">!</text></g>';}
+ $('msgs').innerHTML=h;
+ $('g2').setAttribute('opacity',ma*(0.7+0.3*Math.sin(t*8)));
+ // options
+ const o1=ease((t-st(6))/0.3),o2=ease((t-st(7))/0.3);
+ $('o1').setAttribute('opacity',o1);$('o2').setAttribute('opacity',o2);
+ const pu=t>=st(9)?0.04*Math.sin((t-st(9))*9):0;
+ $('o1').setAttribute('transform',`translate(0 150) translate(290 1610) scale(${0.8+pu}) translate(-290 -1610)`);$('o2').setAttribute('transform',`translate(0 150) translate(790 1610) scale(${0.8-pu}) translate(-790 -1610)`);
+ $('hand').setAttribute('opacity',t<st(6)?1:0);
+ // subtitles
+ const c=chunks.find((c,i)=>t>=c.t-0.02&&t<(chunks[i+1]?Math.max(c.e+0.15,0):c.e+0.6)&&t<(chunks[i+1]?chunks[i+1].t:1e9));
+ $('si').innerHTML=c?subHTML(c):'';
+}
+window.draw=draw;window.T=T;draw(0);
+</script></body></html>
