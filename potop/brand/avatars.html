@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Решай сам — аватарки</title>
+<style>html,body{margin:0;background:#000}svg{display:block}</style></head>
+<body><div id="stage"></div>
+<script>
+const I = 'font-family="Inter"';
+const svg = b => `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800"><defs>
+ <filter id="sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#000" flood-opacity=".35"/></filter>
+ <filter id="sh2" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#000" flood-opacity=".4"/></filter>
+ <filter id="gl"><feGaussianBlur stdDeviation="14"/></filter></defs>${b}</svg>`;
+const rng = s => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+const spark = (x, y, r, c = '#fff') => `<path d="M${x} ${y - r} Q${x} ${y} ${x + r} ${y} Q${x} ${y} ${x} ${y + r} Q${x} ${y} ${x - r} ${y} Q${x} ${y} ${x} ${y - r}Z" fill="${c}"/>`;
+const rays = (cx, cy, n, c1, c2, R = 900) => Array.from({ length: n }, (_, i) => { const a = i * 2 * Math.PI / n, b = (i + .5) * 2 * Math.PI / n; return `<polygon points="${cx},${cy} ${cx + Math.cos(a) * R},${cy + Math.sin(a) * R} ${cx + Math.cos(b) * R},${cy + Math.sin(b) * R}" fill="${i % 2 ? c1 : c2}"/>`; }).join('');
+// знак «развилка»: ножка + две стрелки
+const forkIcon = (cx, cy, k, col, w = 34) => `<g transform="translate(${cx} ${cy}) scale(${k})" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"><path d="M0 130 V30 Q0 -10 -40 -40 L-95 -95"/><path d="M0 30 Q0 -10 40 -40 L95 -95"/><path d="M-100 -30 V-100 H-30"/><path d="M100 -30 V-100 H30"/></g>`;
+
+const AV = {};
+// 1. Монета в подбрасывании (плоский стикер, лучи)
+AV[1] = () => svg(`<rect width="800" height="800" fill="#ffb703"/>${rays(400, 400, 20, '#ffc933', '#ffb703')}
+  <ellipse cx="400" cy="690" rx="190" ry="26" fill="#7a4a00" opacity=".35"/>
+  <g transform="rotate(-14 400 400)" filter="url(#sh)"><circle cx="400" cy="400" r="235" fill="#c77d00" stroke="#5a3300" stroke-width="12"/><circle cx="400" cy="392" r="225" fill="#ffd34d" stroke="#5a3300" stroke-width="12"/><circle cx="400" cy="392" r="178" fill="#ffc21a" stroke="#c77d00" stroke-width="10" stroke-dasharray="4 18" stroke-linecap="round"/>
+  ${forkIcon(400, 395, .95, '#7a4a00', 36)}<path d="M240 270 A190 190 0 0 1 380 205" stroke="#fff3b0" stroke-width="16" stroke-linecap="round" fill="none" opacity=".8"/></g>
+  ${spark(150, 160, 36)}${spark(660, 130, 28)}${spark(690, 660, 40)}${spark(110, 620, 26)}
+  <path d="M96 400 q-30 -60 0 -120 M704 410 q30 60 0 120" stroke="#fff" stroke-width="14" fill="none" stroke-linecap="round" opacity=".8"/>`);
+// 2. Задумчивый человечек (kawaii pastel)
+AV[2] = () => svg(`<defs><linearGradient id="b2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cdb4ff"/><stop offset="1" stop-color="#ffc8dd"/></linearGradient></defs><rect width="800" height="800" fill="url(#b2)"/>
+  <circle cx="200" cy="215" r="98" fill="#fff" stroke="#6d4cb4" stroke-width="10"/><circle cx="600" cy="215" r="98" fill="#fff" stroke="#c2417a" stroke-width="10"/>
+  <circle cx="290" cy="325" r="22" fill="#fff" stroke="#6d4cb4" stroke-width="8"/><circle cx="330" cy="370" r="13" fill="#fff" stroke="#6d4cb4" stroke-width="7"/><circle cx="510" cy="325" r="22" fill="#fff" stroke="#c2417a" stroke-width="8"/><circle cx="470" cy="370" r="13" fill="#fff" stroke="#c2417a" stroke-width="7"/>
+  <text x="200" y="258" text-anchor="middle" ${I} font-weight="900" font-size="130" fill="#6d4cb4">А</text><text x="600" y="258" text-anchor="middle" ${I} font-weight="900" font-size="130" fill="#c2417a">Б</text>
+  <path d="M150 800 Q150 600 400 590 Q650 600 650 800Z" fill="#ff8fab" stroke="#5a2a45" stroke-width="10"/>
+  <circle cx="400" cy="500" r="165" fill="#ffd6a5" stroke="#5a2a45" stroke-width="10"/>
+  <ellipse cx="330" cy="505" rx="42" ry="50" fill="#fff" stroke="#5a2a45" stroke-width="8"/><ellipse cx="470" cy="505" rx="42" ry="50" fill="#fff" stroke="#5a2a45" stroke-width="8"/>
+  <circle cx="345" cy="490" r="22" fill="#2b1b2e"/><circle cx="485" cy="490" r="22" fill="#2b1b2e"/><circle cx="351" cy="482" r="7" fill="#fff"/><circle cx="491" cy="482" r="7" fill="#fff"/>
+  <path d="M285 440 q40 -30 80 -6" stroke="#5a2a45" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M435 424 q40 -8 80 18" stroke="#5a2a45" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M370 585 q30 -18 60 0" stroke="#5a2a45" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="270" cy="565" r="22" fill="#ff8fab" opacity=".6"/><circle cx="530" cy="565" r="22" fill="#ff8fab" opacity=".6"/>
+  <path d="M300 760 q-10 -90 60 -110" stroke="#5a2a45" stroke-width="10" fill="#ffd6a5" stroke-linecap="round"/>`);
+// 3. Пиксель-арт: закат и развилка (8-bit)
+AV[3] = () => { const N = 40, u = 20, cells = []; const inPoly = (x, y, p) => { let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const [xi, yi] = p[i], [xj, yj] = p[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c; } return c; };
+  const stem = [[16, 40], [24, 40], [22, 30], [18, 30]], left = [[18, 30], [22, 30], [12, 22], [8, 22]], right = [[18, 30], [22, 30], [32, 22], [28, 22]];
+  const cols = ['#2b1055', '#4a1d7a', '#7a2a8f', '#c2379b', '#ff5d8f', '#ff9a5a', '#ffd35a']; let out = '';
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const px = x + .5, py = y + .5; let c; const hz = 22;
+    if (py < hz) { c = cols[Math.min(6, Math.floor(py / hz * 7))]; const d = Math.hypot(px - 20, py - 16); if (d < 6) c = '#fff1a8'; else if (d < 7.2) c = '#ffd35a'; if (py < 9 && ((x * 7 + y * 13) % 29 === 0)) c = '#fff'; }
+    else { c = ((x + y) % 2 && py < 25) ? '#1f0a3d' : '#16062e'; if (py < 24) c = '#1f0a3d'; if (inPoly(px, py, stem) || inPoly(px, py, left) || inPoly(px, py, right)) c = (Math.abs(px - 20) < .6 && (y % 3 === 0) && py > 30) ? '#ffd35a' : '#6b5b95'; }
+    out += `<rect x="${x * u}" y="${y * u}" width="${u + .5}" height="${u + .5}" fill="${c}"/>`; }
+  // силуэты холмов (пиксельно)
+  for (let x = 0; x < N; x++) { const h = Math.round(2 + 2 * Math.sin(x * .45) + (x < 12 || x > 28 ? 2 : 0)); for (let k = 0; k < h; k++) out += `<rect x="${x * u}" y="${(21 - k) * u}" width="${u + .5}" height="${u + .5}" fill="#12052a"/>`; }
+  return svg(out + `<rect x="0" y="0" width="800" height="800" fill="none"/>`); };
+// 4. Дорожный знак-развилка (стикер)
+AV[4] = () => svg(`<defs><linearGradient id="b4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4cc9f0"/><stop offset="1" stop-color="#b5f0ff"/></linearGradient></defs><rect width="800" height="800" fill="url(#b4)"/>
+  ${[[130, 640, 90], [230, 610, 120], [560, 650, 100], [660, 620, 80], [80, 200, 60], [700, 180, 70]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity=".85"/>`).join('')}
+  <rect x="375" y="560" width="50" height="260" fill="#6b7280" stroke="#374151" stroke-width="8"/>
+  <g filter="url(#sh)"><rect x="150" y="130" width="500" height="500" rx="70" fill="#fff"/><rect x="178" y="158" width="444" height="444" rx="50" fill="#0057b8"/><rect x="198" y="178" width="404" height="404" rx="38" fill="none" stroke="#fff" stroke-width="10"/>${forkIcon(400, 375, 1.35, '#fff', 30)}</g>`);
+// 5. Светофор: красный и зелёный сразу (минимализм)
+AV[5] = () => svg(`<rect width="800" height="800" fill="#fff1d0"/><circle cx="400" cy="400" r="380" fill="#ffe3a3"/>
+  <path d="M430 700 L800 1070 V800 H520Z" fill="#000" opacity=".08"/>
+  <rect x="260" y="70" width="280" height="660" rx="140" fill="#2b2d42" stroke="#14151f" stroke-width="12" filter="url(#sh)"/>
+  <circle cx="400" cy="215" r="82" fill="#ff3b4e"/><circle cx="400" cy="215" r="82" fill="none" stroke="#ff8a96" stroke-width="10" opacity=".7" stroke-dasharray="90 400" transform="rotate(200 400 215)"/>
+  <circle cx="400" cy="400" r="82" fill="#4a4d63"/><circle cx="400" cy="585" r="82" fill="#2ee27a"/><circle cx="400" cy="585" r="82" fill="none" stroke="#a9ffd0" stroke-width="10" opacity=".7" stroke-dasharray="90 400" transform="rotate(200 400 585)"/>
+  <circle cx="400" cy="215" r="130" fill="#ff3b4e" opacity=".22" filter="url(#gl)"/><circle cx="400" cy="585" r="130" fill="#2ee27a" opacity=".22" filter="url(#gl)"/>
+  <rect x="385" y="725" width="30" height="80" fill="#14151f"/>`);
+// 6. Большая красная кнопка (поп-арт)
+AV[6] = () => svg(`<defs><pattern id="ht" width="30" height="30" patternUnits="userSpaceOnUse" patternTransform="rotate(25)"><rect width="30" height="30" fill="#ffd60a"/><circle cx="15" cy="15" r="6" fill="#ff9f1c"/></pattern></defs><rect width="800" height="800" fill="url(#ht)"/>
+  <g transform="translate(400 400) scale(.86) translate(-400 -380)"><polygon points="${Array.from({ length: 28 }, (_, i) => { const a = i * Math.PI / 14, k = i % 2 ? 250 : 360; return `${(400 + Math.cos(a) * k).toFixed(0)},${(400 + Math.sin(a) * k).toFixed(0)}`; }).join(' ')}" fill="#fff" stroke="#111" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="400" cy="640" rx="230" ry="60" fill="#111" opacity=".3"/>
+  <path d="M170 560 V610 Q170 680 400 680 Q630 680 630 610 V560Z" fill="#8d99ae" stroke="#111" stroke-width="12" stroke-linejoin="round"/><ellipse cx="400" cy="560" rx="230" ry="70" fill="#adb5bd" stroke="#111" stroke-width="12"/>
+  <path d="M255 470 V540 Q255 590 400 590 Q545 590 545 540 V470Z" fill="#b5001a" stroke="#111" stroke-width="12" stroke-linejoin="round"/><ellipse cx="400" cy="470" rx="145" ry="62" fill="#ff2d3f" stroke="#111" stroke-width="12"/><ellipse cx="365" cy="452" rx="62" ry="20" fill="#ff8a93" opacity=".85"/>
+  <text x="400" y="190" text-anchor="middle" ${I} font-weight="900" font-size="120" fill="#e63946" stroke="#111" stroke-width="12" paint-order="stroke">ЖМИ!</text></g>`);
+// 7. Кинохлопушка (ретро-кино)
+AV[7] = () => svg(`<rect width="800" height="800" fill="#8b1e2d"/>${rays(400, 420, 24, '#a32436', '#8b1e2d')}
+  <g transform="rotate(-6 400 420)" filter="url(#sh)"><rect x="140" y="330" width="520" height="330" rx="18" fill="#17171c" stroke="#fff" stroke-width="10"/><path d="M140 400 H660" stroke="#fff" stroke-width="8"/>
+  ${forkIcon(400, 525, .5, '#fff', 30)}<path d="M180 450 H300 M180 480 H280 M500 450 H620 M520 480 H620" stroke="#8b8b99" stroke-width="10" stroke-linecap="round"/>
+  <g transform="rotate(-16 140 330)"><rect x="140" y="250" width="520" height="80" rx="14" fill="#17171c" stroke="#fff" stroke-width="10"/>${Array.from({ length: 6 }, (_, i) => `<polygon points="${170 + i * 88},330 ${220 + i * 88},330 ${250 + i * 88},250 ${200 + i * 88},250" fill="#fff"/>`).join('')}</g>
+  <rect x="140" y="320" width="520" height="70" rx="14" fill="#17171c" stroke="#fff" stroke-width="10"/>${Array.from({ length: 6 }, (_, i) => `<polygon points="${160 + i * 88},390 ${210 + i * 88},390 ${240 + i * 88},320 ${190 + i * 88},320" fill="#fff"/>`).join('')}</g>
+  ${spark(130, 150, 34, '#ffd166')}${spark(670, 190, 26, '#ffd166')}${spark(640, 700, 32, '#ffd166')}${spark(160, 690, 24, '#ffd166')}`);
+// 8. Компас с двумя стрелками (винтажная эмблема)
+AV[8] = () => svg(`<rect width="800" height="800" fill="#12355b"/><circle cx="400" cy="400" r="370" fill="none" stroke="#e9d8a6" stroke-width="10"/><circle cx="400" cy="400" r="340" fill="#0f2c4d" stroke="#e9d8a6" stroke-width="6"/>
+  ${Array.from({ length: 72 }, (_, i) => { const a = i * Math.PI / 36, r1 = i % 6 === 0 ? 300 : 316; return `<path d="M${400 + Math.cos(a) * r1} ${400 + Math.sin(a) * r1} L${400 + Math.cos(a) * 332} ${400 + Math.sin(a) * 332}" stroke="#e9d8a6" stroke-width="${i % 6 === 0 ? 7 : 3}"/>`; }).join('')}
+  <g fill="#e9d8a6" opacity=".9"><polygon points="400,110 425,400 400,690 375,400"/><polygon points="110,400 400,375 690,400 400,425"/></g><g fill="#c9a227" opacity=".9" transform="rotate(45 400 400)"><polygon points="400,170 418,400 400,630 382,400"/><polygon points="170,400 400,382 630,400 400,418"/></g>
+  <g transform="rotate(-38 400 400)" filter="url(#sh2)"><polygon points="400,90 440,400 360,400" fill="#e63946" stroke="#fff" stroke-width="6" stroke-linejoin="round"/><polygon points="400,400 440,400 400,520 360,400" fill="#7a1b22"/></g>
+  <g transform="rotate(38 400 400)" filter="url(#sh2)"><polygon points="400,90 440,400 360,400" fill="#2ec4b6" stroke="#fff" stroke-width="6" stroke-linejoin="round"/><polygon points="400,400 440,400 400,520 360,400" fill="#1b6e66"/></g>
+  <circle cx="400" cy="400" r="26" fill="#e9d8a6" stroke="#0f2c4d" stroke-width="8"/>`);
+// 9. Космонавт между двумя планетами
+AV[9] = () => { const r = rng(4); let st = ''; for (let i = 0; i < 70; i++) st += `<circle cx="${(r() * 800).toFixed(0)}" cy="${(r() * 800).toFixed(0)}" r="${(1 + r() * 2.4).toFixed(1)}" fill="#fff" opacity="${(.3 + r() * .7).toFixed(2)}"/>`;
+  return svg(`<defs><radialGradient id="b9" cx=".5" cy=".5" r=".75"><stop offset="0" stop-color="#2a2b6b"/><stop offset="1" stop-color="#090b22"/></radialGradient><radialGradient id="p1" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffb36b"/><stop offset="1" stop-color="#c2410c"/></radialGradient><radialGradient id="p2" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#7ef0e0"/><stop offset="1" stop-color="#0f766e"/></radialGradient></defs><rect width="800" height="800" fill="url(#b9)"/>${st}
+  <ellipse cx="180" cy="270" rx="165" ry="38" fill="none" stroke="#ffd7a8" stroke-width="12" transform="rotate(-22 180 270)" opacity=".9"/><circle cx="180" cy="270" r="95" fill="url(#p1)"/><ellipse cx="180" cy="270" rx="165" ry="38" fill="none" stroke="#ffd7a8" stroke-width="12" transform="rotate(-22 180 270)" stroke-dasharray="0 0" clip-path="inset(50% 0 0 0)"/>
+  <circle cx="620" cy="560" r="125" fill="url(#p2)"/><circle cx="580" cy="520" r="24" fill="#0b8a80"/><circle cx="670" cy="600" r="18" fill="#0b8a80"/><circle cx="600" cy="620" r="12" fill="#0b8a80"/>
+  <g filter="url(#sh2)"><path d="M338 395 L240 330 M462 395 L560 450" stroke="#fff" stroke-width="42" stroke-linecap="round"/><circle cx="238" cy="328" r="26" fill="#e5e7eb"/><circle cx="562" cy="452" r="26" fill="#e5e7eb"/>
+  <rect x="332" y="365" width="136" height="170" rx="56" fill="#f3f4f6" stroke="#9ca3af" stroke-width="6"/><rect x="368" y="415" width="64" height="50" rx="10" fill="#cbd5e1"/><circle cx="385" cy="440" r="8" fill="#ef4444"/><circle cx="415" cy="440" r="8" fill="#22c55e"/>
+  <path d="M372 530 L355 640 M428 530 L445 640" stroke="#fff" stroke-width="38" stroke-linecap="round"/>
+  <circle cx="400" cy="300" r="85" fill="#f3f4f6" stroke="#9ca3af" stroke-width="6"/><ellipse cx="400" cy="300" rx="62" ry="52" fill="#1e293b"/><ellipse cx="380" cy="282" rx="20" ry="12" fill="#fff" opacity=".7"/></g>`); };
+// 10. Бумажный лес: развилка тропы (papercut)
+AV[10] = () => { const tree = (x, y, s, c) => `<g transform="translate(${x} ${y}) scale(${s})" fill="${c}"><polygon points="0,-150 45,-70 20,-70 60,0 -60,0 -20,-70 -45,-70"/><rect x="-8" y="0" width="16" height="30"/></g>`;
+  return svg(`<defs><linearGradient id="b10" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb26b"/><stop offset=".6" stop-color="#ff6f91"/><stop offset="1" stop-color="#6c4ab6"/></linearGradient><filter id="ps" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="10" stdDeviation="7" flood-color="#2a1250" flood-opacity=".55"/></filter></defs>
+  <rect width="800" height="800" fill="url(#b10)"/><circle cx="400" cy="270" r="150" fill="#fff4d6" filter="url(#ps)"/>
+  <path d="M0 470 Q150 380 300 450 T600 430 T800 440 V800 H0Z" fill="#7b5bb8" filter="url(#ps)"/>
+  <path d="M0 540 Q200 460 400 530 T800 500 V800 H0Z" fill="#4b3a96" filter="url(#ps)"/>
+  <g filter="url(#ps)">${tree(120, 520, .9, '#3b2c7a')}${tree(230, 540, .7, '#3b2c7a')}${tree(690, 520, .95, '#3b2c7a')}${tree(590, 545, .7, '#3b2c7a')}</g>
+  <path d="M0 640 Q250 560 400 620 T800 600 V800 H0Z" fill="#2c1f63" filter="url(#ps)"/>
+  <g filter="url(#ps)"><path d="M320 800 L360 650 L395 590 L405 590 L440 650 L480 800Z" fill="#ffe8b0"/><path d="M395 592 L330 520 L300 505 L335 495 L405 570Z" fill="#ffe8b0"/><path d="M405 592 L470 520 L500 505 L465 495 L395 570Z" fill="#ffe8b0"/></g>
+  <g filter="url(#ps)">${tree(90, 740, 1.5, '#1b1245')}${tree(710, 750, 1.6, '#1b1245')}</g>`); };
+
+const q = new URLSearchParams(location.search);
+document.getElementById('stage').innerHTML = AV[q.get('n') || 1]();
+</script></body></html>
