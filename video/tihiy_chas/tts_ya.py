@@ -8,8 +8,16 @@ S=["Ты на мели. До зарплаты три дня. Холодильн�
 "Она никогда так не писала. Что-то случилось?","Осталось сорок минут. Ты ещё держишься.",
 "Первое. Забрать пять тысяч.","Второе. Позвонить маме.",
 "Что бы ты сделал?","Один или два?"]
+STRESS={w.replace('+',''):w for w in '''мел+и зарпл+аты дн+я холод+ильник незнак+омец теб+е тыс+яч рубл+ей пр+ямо сейч+ас нал+ичными усл+овие прост+ое тр+огай телеф+он экр+ан заблок+ирован откр+ыть нельз+я тайм+ер сообщ+ения лет+ят л+ена б+анк раб+ота курь+ер нужн+ы эти д+еньги +очень вдр+уг м+ама позвон+и ср+очно он+а никогд+а пис+ала случ+илось остал+ось с+орок мин+ут держ+ишься п+ервое забр+ать втор+ое позвон+ить м+аме сд+елал од+ин ил+и'''.split()}
+STRESS['тысяч']='тыс+яч'
+def stressed(p):
+    def f(m):
+        w=m.group(0);k=w.lower().replace('ё','е')
+        return STRESS.get(k,w) if 'ё' not in w.lower() else w
+    return re.sub(r'[А-Яа-яЁё]+',f,p)
 def syn(text,out):
-    body=json.dumps({"text":text,"hints":[{"voice":VOICE},{"speed":SPEED}],"outputAudioSpec":{"containerAudio":{"containerAudioType":"MP3"}}}).encode()
+    text=stressed(text)
+    body=json.dumps({"text":text,"hints":[{"voice":VOICE},{"speed":SPEED}],"loudnessNormalizationType":"LUFS","outputAudioSpec":{"containerAudio":{"containerAudioType":"MP3"}}}).encode()
     for a in range(8):
         try:
             r=urllib.request.Request("https://tts.api.cloud.yandex.net/tts/v3/utteranceSynthesis",body,{"Content-Type":"application/json"})
@@ -47,6 +55,17 @@ def align(wv,ws,d):
             i=j
         else: i+=1
     return res,sum(r is not None for r in res)
+def level(wv):
+    import numpy as np,wave
+    w=wave.open(wv);sr=w.getframerate();a=np.frombuffer(w.readframes(w.getnframes()),dtype=np.int16).astype(np.float32)/32768;w.close()
+    n=int(sr*0.05);env=np.sqrt(np.convolve(a**2,np.ones(n)/n,mode='same'))+1e-6
+    target=np.percentile(env[env>0.02],70) if (env>0.02).any() else 0.1
+    g=np.clip(target/env,0.6,4.0);g[env<0.004]=1.0   # не поднимаем шум
+    k=int(sr*0.08);g=np.convolve(np.pad(g,(k,k),mode='edge'),np.ones(2*k+1)/(2*k+1),mode='valid')
+    o=np.tanh(a*g*0.9)*1.05
+    o=o/max(1e-6,np.abs(o).max())*0.89
+    import struct
+    w=wave.open(wv,'wb');w.setnchannels(1);w.setsampwidth(2);w.setframerate(sr);w.writeframes((o*32767).astype(np.int16).tobytes());w.close()
 def dur(f): return float(subprocess.check_output(["ffprobe","-v","error","-show_entries","format=duration","-of","csv=p=0",f]))
 words=[];lst=[];t0=0.0;parts=[]
 for i,s in enumerate(S):
@@ -55,7 +74,7 @@ for i,s in enumerate(S):
         mp=f"p{i}_{j}.mp3";wv=f"p{i}_{j}.wav"
         if not os.path.exists(mp): syn(p,mp)
         subprocess.run(["ffmpeg","-y","-v","error","-i",mp,"-ar","44100","-ac","1","-af","silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse",wv],check=True)
-        d=dur(wv);ws=p.split()
+        level(wv);d=dur(wv);ws=p.split()
         al,_=align(wv,ws,d)
         for w,(a,b) in zip(ws,al):
             words.append({"t":t0+a,"d":max(0.08,b-a),"w":w,"s":i})
