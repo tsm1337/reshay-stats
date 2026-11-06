@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Баннеры в стиле аватарок</title>
+<style>html,body{margin:0;background:#000}svg{display:block}</style></head>
+<body><div id="stage"></div>
+<script>
+const I = 'font-family="Inter"';
+const svg = b => `<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="1440" viewBox="0 0 2560 1440"><defs>
+ <filter id="sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="#000" flood-opacity=".4"/></filter>
+ <filter id="gl" filterUnits="userSpaceOnUse" x="-500" y="-500" width="3600" height="2500"><feGaussianBlur stdDeviation="40"/></filter></defs>${b}</svg>`;
+const rng = s => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+const spark = (x, y, r, c = '#fff') => `<path d="M${x} ${y - r} Q${x} ${y} ${x + r} ${y} Q${x} ${y} ${x} ${y + r} Q${x} ${y} ${x - r} ${y} Q${x} ${y} ${x} ${y - r}Z" fill="${c}"/>`;
+const rays = (cx, cy, n, c1, c2, R = 3000) => Array.from({ length: n }, (_, i) => { const a = i * 2 * Math.PI / n, b = (i + .5) * 2 * Math.PI / n; return `<polygon points="${cx},${cy} ${cx + Math.cos(a) * R},${cy + Math.sin(a) * R} ${cx + Math.cos(b) * R},${cy + Math.sin(b) * R}" fill="${i % 2 ? c1 : c2}"/>`; }).join('');
+const forkIcon = (k, col, w = 36) => `<g transform="scale(${k})" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"><path d="M0 130 V30 Q0 -10 -40 -40 L-95 -95"/><path d="M0 30 Q0 -10 40 -40 L95 -95"/><path d="M-100 -30 V-100 H-30"/><path d="M100 -30 V-100 H30"/></g>`;
+// монета как на аватарке (радиус ≈ 235·k)
+const coin = (cx, cy, k, rot, o = {}) => `<g transform="translate(${cx} ${cy}) rotate(${rot}) scale(${k})" ${o.shadow === false ? '' : 'filter="url(#sh)"'} opacity="${o.op ?? 1}"><circle r="235" fill="#c77d00" stroke="#5a3300" stroke-width="12"/><circle cy="-8" r="225" fill="#ffd34d" stroke="#5a3300" stroke-width="12"/><circle cy="-8" r="178" fill="#ffc21a" stroke="#c77d00" stroke-width="10" stroke-dasharray="4 18" stroke-linecap="round"/>
+  <g transform="translate(0 -5)">${forkIcon(.95, '#7a4a00', 36)}</g><path d="M-160 -122 A190 190 0 0 1 -20 -187" stroke="#fff3b0" stroke-width="16" stroke-linecap="round" fill="none" opacity=".8"/></g>`;
+
+// ---------- пиксель-арт: панорама «закат и развилка» (80×45 клеток по 32 px) ----------
+const PAL = {
+  purple: { sky: ['#1b0a3d', '#3a1470', '#6a2a8f', '#b0378f', '#ff5d8f', '#ff9a5a', '#ffd35a'], sun: '#fff1a8', edge: '#ffd35a', g1: '#1f0a3d', g2: '#16062e', hill: '#12052a', road: '#6b5b95', rEdge: '#8d7fb8', dash: '#ffd35a', man: '#0b0420' },
+  teal: { sky: ['#071a33', '#0d3b66', '#1b6ca8', '#3ba3c4', '#7fd1c0', '#f7d58a', '#ffb36b'], sun: '#fff6d0', edge: '#ffd89a', g1: '#0e3036', g2: '#081f24', hill: '#0a2330', road: '#8aa5a8', rEdge: '#b3c9cb', dash: '#fff6d0', man: '#041016' },
+};
+function pixelBanner(pal) {
+  const N = 80, M = 45, u = 32, H = 22; let out = '';
+  const near = (px, py, ax, ay, bx, by, w0, w1) => { const dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy, s = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / L)), d = Math.hypot(px - (ax + dx * s), py - (ay + dy * s)); return { d, s, w: w0 + (w1 - w0) * s }; };
+  for (let y = 0; y < M; y++) for (let x = 0; x < N; x++) {
+    const px = x + .5, py = y + .5; let c;
+    if (y < H) {
+      const bp = y / H * 7, i = Math.min(6, Math.floor(bp)), fr = bp - i; c = pal.sky[i]; if (fr > .75 && i < 6 && (x + y) % 2 === 0) c = pal.sky[i + 1];
+      if (y < 13 && (x * 7 + y * 13) % 41 === 0) c = '#fff';
+      const d = Math.hypot(px - 40, py - 18.6); if (d < 3.9) c = (y === 20) ? pal.sky[5] : pal.sun; else if (d < 4.9) c = pal.edge;
+      const hh = Math.round(2 + 2 * Math.sin(x * .3) + 1.6 * Math.sin(x * .11 + 1) + (x < 14 || x > 66 ? 2 : 0)); if (y >= H - hh) c = pal.hill;
+    } else {
+      c = (y < H + 4 && (x + y) % 2) ? pal.g2 : pal.g1; if (y >= H + 4) c = pal.g1;
+      const st = near(px, py, 40, 46, 40, 27, 5.8, 2.1), lb = near(px, py, 40, 27, 12, 23, 2.3, .7), rb = near(px, py, 40, 27, 68, 23, 2.3, .7);
+      const hit = [st, lb, rb].filter(r => r.d < r.w).sort((a, b) => a.d / a.w - b.d / b.w)[0];
+      if (hit) { c = hit.d > hit.w - .8 ? pal.rEdge : pal.road; if (hit.d < .55 && Math.floor(hit.s * 9) % 2 === 0) c = pal.dash; }
+    }
+    out += `<rect x="${x * u}" y="${y * u}" width="${u + .6}" height="${u + .6}" fill="${c}"/>`;
+  }
+  // человечек со спины на развилке
+  const px = (cx, cy, w, h) => `<rect x="${cx * u}" y="${cy * u}" width="${w * u}" height="${h * u}" fill="${pal.man}"/>`;
+  out += px(39, 32, 2, 2) + px(38, 34, 4, 4) + px(37, 35, 1, 3) + px(42, 35, 1, 3) + px(38, 38, 2, 3) + px(40, 38, 2, 3);
+  return out;
+}
+
+const V = {
+  1: () => svg(pixelBanner(PAL.purple)),
+  2: () => svg(pixelBanner(PAL.teal)),
+  // монета, лучи
+  3: () => svg(`<rect width="2560" height="1440" fill="#ffb703"/>${rays(1280, 720, 36, '#ffc933', '#ffb703')}
+    <ellipse cx="1280" cy="1010" rx="330" ry="40" fill="#7a4a00" opacity=".3"/>
+    ${coin(1280, 700, .88, -12)}${coin(640, 800, .46, 16)}${coin(1930, 640, .5, -20)}${coin(250, 560, .34, 8)}${coin(2330, 900, .38, -10)}
+    ${spark(900, 400, 44)}${spark(1700, 380, 36)}${spark(520, 1100, 34)}${spark(2060, 1150, 46)}${spark(120, 1000, 30)}${spark(2440, 400, 34)}${spark(1100, 1130, 28)}
+    <path d="M880 650 q-40 -80 0 -170 M1680 740 q40 80 0 170" stroke="#fff" stroke-width="16" fill="none" stroke-linecap="round" opacity=".8"/>`),
+  // монеты + вопрос «А ты что выберешь?»
+  4: () => svg(`<rect width="2560" height="1440" fill="#ffb703"/>${rays(1280, 720, 36, '#ffc933', '#ffb703')}
+    ${coin(300, 760, .62, -14)}${coin(2260, 700, .62, 14)}${coin(130, 300, .3, 10)}${coin(2430, 1150, .32, -8)}
+    <polygon transform="translate(1280 720) scale(1.0 .56) translate(-1280 -720)" points="${Array.from({ length: 36 }, (_, i) => { const a = i * Math.PI / 18, k = i % 2 ? 640 : 820; return `${(1280 + Math.cos(a) * k * 1.0).toFixed(0)},${(720 + Math.sin(a) * k).toFixed(0)}`; }).join(' ')}" fill="#fff" stroke="#5a3300" stroke-width="18" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <text x="1280" y="700" text-anchor="middle" ${I} font-weight="900" font-size="150" textLength="1280" lengthAdjust="spacingAndGlyphs" fill="#e63946" stroke="#5a3300" stroke-width="14" paint-order="stroke">А ТЫ ЧТО</text>
+    <text x="1280" y="860" text-anchor="middle" ${I} font-weight="900" font-size="150" textLength="1280" lengthAdjust="spacingAndGlyphs" fill="#5a3300">ВЫБЕРЕШЬ?</text>
+    ${spark(560, 360, 40)}${spark(2000, 340, 34)}${spark(520, 1120, 30)}${spark(2060, 1110, 42)}`),
+  // тёмный фон, дождь из монет
+  5: () => { const r = rng(9); let bg = ''; for (let i = 0; i < 70; i++) bg += `<circle cx="${(r() * 2560).toFixed(0)}" cy="${(r() * 1440).toFixed(0)}" r="${(1 + r() * 2.4).toFixed(1)}" fill="#fff" opacity="${(.2 + r() * .6).toFixed(2)}"/>`;
+    let cs = ''; const items = [[240, 260, .3, 20, 1], [520, 1000, .42, -25, 1], [820, 330, .26, 40, .9], [1000, 1150, .34, 12, 1], [1560, 300, .3, -30, 1], [1760, 1120, .4, 25, 1], [2040, 380, .36, -12, 1], [2320, 980, .44, 18, 1], [2400, 280, .24, 30, .9], [140, 1180, .36, -15, 1]];
+    items.forEach(([x, y, k, rot]) => cs += coin(x, y, k, rot));
+    return svg(`<defs><radialGradient id="bgd" cx=".5" cy=".5" r=".75"><stop offset="0" stop-color="#2b3b66"/><stop offset="1" stop-color="#0a1020"/></radialGradient></defs><rect width="2560" height="1440" fill="url(#bgd)"/>${bg}
+      <circle cx="1280" cy="720" r="520" fill="#ffc21a" opacity=".35" filter="url(#gl)"/>${cs}${coin(1280, 720, .86, -10)}${spark(900, 470, 40)}${spark(1700, 980, 46)}${spark(760, 1000, 30)}${spark(1820, 420, 34)}`); },
+};
+const q = new URLSearchParams(location.search);
+document.getElementById('stage').innerHTML = V[q.get('n') || 1]();
+</script></body></html>
