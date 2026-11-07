@@ -11,7 +11,7 @@ CUT = set()
 if os.environ.get('CUT_EXTRA'):
     CUT |= set(map(int, os.environ['CUT_EXTRA'].split(',')))
 KEEP = [i for i in range(len(words)) if i not in CUT]
-SPECIAL = {3: .55, 10: .5, 13: .35, 44: .45, 51: .4, 53: .85, 55: .95, 61: .95, 31: .4}  # драматические паузы перед словом i
+SPECIAL = {3: .55, 22: .5, 27: .5, 31: .35, 80: .5, 87: .45, 99: .45, 100: .4, 102: .4, 110: .85, 112: .5, 115: .95, 121: .5, 124: .5, 127: .95, 72: .45}  # драматические паузы перед словом i
 DEF_SENT, DEF_IN = .36, .28
 PAD_IN, PAD_OUT = .05, .09
 
