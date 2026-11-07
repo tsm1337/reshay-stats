@@ -5,7 +5,7 @@ import json, subprocess, sys, os
 H = os.path.dirname(os.path.abspath(__file__)); S1 = os.path.join(H, '..', 'sound'); S2 = os.path.join(H, '..', 'sound2'); CR = os.path.join(S2, 'oga', 'creature')
 W = {w['i']: w for w in json.load(open(os.path.join(H, 'words_short.json')))}
 T = lambda i: W[i]['s']
-VE = max(w['e'] for w in W.values()) + .35; DUR = VE + 4.5
+VE = max(w['e'] for w in W.values()) + .35; DUR = VE + 3.0
 VOICE_GAIN = 13.0
 BED_GAIN = (-27.0 + VOICE_GAIN) - 19.0 - (-32.9)
 EV = []

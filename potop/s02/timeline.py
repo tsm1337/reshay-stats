@@ -47,7 +47,7 @@ out = out[:int(voice_end * SR)]
 wav = os.path.join(H, 'voice_short.wav')
 subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-f', 'f32le', '-ar', str(SR), '-ac', '1', '-i', '-', wav], input=out.tobytes(), check=True)
 json.dump([{'i': i, 'w': words[i]['w'], 's': round(new_words[i][0], 3), 'e': round(new_words[i][1], 3)} for i in KEEP], open(os.path.join(H, 'words_short.json'), 'w'), ensure_ascii=False)
-OUTRO = 4.5
+OUTRO = 3.0
 print(f'речь до {last_end:.1f} с, ролик {voice_end + OUTRO:.1f} с (с титром {OUTRO} с)')
 line = ''
 for i in KEEP:

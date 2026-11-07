@@ -18,7 +18,7 @@ const blinkAt = (t, period = 3.7, off = 0) => ((t + off) % period) < .12;
 const breathe = t => 1 + Math.sin(t * 2.2) * .006;
 const pop = (t, a, d = .22) => { const k = ramp(t, a, a + d); return k <= 0 ? 0 : 1 + Math.sin(k * Math.PI) * .12 * (1 - k) + 0; };
 
-let WORDS = [], GROUPS = [], WM = {}, S = [], OUTRO = 4.5;
+let WORDS = [], GROUPS = [], WM = {}, S = [], OUTRO = 3.0;
 const T = i => WM[i].s, TE = i => WM[i].e;
 const KEY = { 'Свет': 'y', 'Кроме': 'r', 'нашего': 'r', 'дома': 'r', 'ударило': 'r', 'Лампочка': 'y', 'десять': 'r', 'Бабушка': 'y', 'студентов': 'y', 'собакой': 'y', 'лодка': 'y', 'одного': 'r', 'Только': 'y', 'один': 'r', 'колен': 'r', 'железом': 'y', 'поезда': 'y', 'минут': 'r', 'зря': 'r', 'закричал': 'r', 'первым': 'r', 'давка': 'r', 'Собака': 'y', 'завыла': 'r', 'Вера': 'y', 'лодкой': 'y', 'Решайте': 'y', 'сами': 'y', 'двигался': 'y', 'шумела': 'y', 'закашлялся': 'r', 'болен': 'r', 'свисток': 'y', 'Дедушкин': 'y', 'дунул': 'r', 'стеклу': 'y', 'Вода': 'y', 'замерла': 'r', 'замолчала': 'r', 'одеялом': 'y', 'проверили': 'y', 'пустой': 'r', 'Аня': 'r' };
 function prepWords(raw) {
@@ -77,7 +77,7 @@ const waterOver = (wy, op = .5) => `<rect x="0" y="${wy}" width="1080" height="$
 const eyesRow = (t, at, n = 10, y = 1000) => { const r = A.rng(3); let s = ''; for (let i = 0; i < n; i++) { const k = E(t, at + i * .05, at + i * .05 + .25), x = 80 + i * 100 + r() * 30, yy = y + (r() - .5) * 360; s += `<g opacity="${k}"><circle cx="${x}" cy="${yy}" r="9" fill="#a9dbe3"/><circle cx="${x + 34}" cy="${yy}" r="9" fill="#a9dbe3"/></g>`; } return s; };
 
 function buildScenes() {
-  S = []; OUTRO = 4.5;
+  S = []; OUTRO = 3.0;
   const A_ = [0, T(6) - .1, T(12) - .1, T(16) - .1, T(22) - .1, T(27) - .1, T(33) - .1, T(40) - .1, T(47) - .1, T(57) - .15, T(62) - .1, T(66) - .1, T(72) - .1, T(77) - .15, T(85) - .2, T(91) - .1, T(96) - .1, T(100) - .15, T(102) - .1, T(110) - .15, T(112) - .1, T(115) - .2, T(121) - .1, T(124) - .1, T(127) - .15];
   const VE = WORDS[WORDS.length - 1].e + .35;
   window.VOICE_END = VE; window.DURATION = VE + OUTRO;
@@ -156,18 +156,12 @@ function buildScenes() {
   // 25. Это была Аня
   { const [a, b] = nx(); sc(a, VE, t => { const hd = E(t, T(127), T(129) + .5); return { w: `<rect width="1080" height="1920" fill="#080b0f"/><circle cx="540" cy="1000" r="650" fill="url(#flashC)" opacity="${.5 + hd * .4}"/>
     <g transform="${cam(lerp(1.9, 2.5, E(t, a, VE)), 540, 1230)}"><g transform="translate(240 1060)">${A.boatBlanket({ head: hd, lump: 0 })}</g></g>`, vig: 1 }; }); }
-  // титр: выбор зрителя
-  sc(VE, 999, t => { const k = E(t, VE + .1, VE + .6), k2 = E(t, VE + 1.2, VE + 1.8);
-    return { w: `<rect width="1080" height="1920" fill="#05070a"/>
-      <g opacity="${k}"><text x="540" y="360" text-anchor="middle" font-family="Inter" font-weight="900" font-size="120" letter-spacing="16" fill="#e6e1d3">ПОТОП</text>
-      <text x="540" y="450" text-anchor="middle" font-family="Inter" font-weight="800" font-size="50" fill="#ff5444">Кого оставить в лодке?</text></g>
-      <g opacity="${k2}">
-        <g transform="translate(300 1190) scale(1.5) translate(-100 -392)">${A.vera({ beam: false })}</g><g transform="translate(780 1190) scale(1.5) translate(-100 -392)">${A.anya({})}</g>
-        <rect x="120" y="1240" width="360" height="130" rx="26" fill="#f2cf63"/><text x="300" y="1332" text-anchor="middle" font-family="Inter" font-weight="900" font-size="72" fill="#1a1410">А · Вера</text>
-        <rect x="600" y="1240" width="360" height="130" rx="26" fill="#ff5444"/><text x="780" y="1332" text-anchor="middle" font-family="Inter" font-weight="900" font-size="72" fill="#fff">Б · Аня</text>
-        <text x="540" y="1520" text-anchor="middle" font-family="Inter" font-weight="800" font-size="52" fill="#e6e1d3">Голосуй в комментариях</text>
-        <text x="540" y="1595" text-anchor="middle" font-family="Inter" font-weight="600" font-size="38" fill="#7d8e9a">Серия 3 — по твоему выбору</text></g>
-      <text x="540" y="1790" text-anchor="middle" font-family="Inter" font-weight="800" font-size="40" fill="#9fb2bf" opacity="${k}">Решай сам</text>`, noSub: true, vig: .5 }; });
+  // титр: без выбора, серия 3 — скоро
+  sc(VE, 999, t => { const k = E(t, VE + .1, VE + .6);
+    return { w: `<rect width="1080" height="1920" fill="#05070a"/><g opacity="${k}"><text x="540" y="860" text-anchor="middle" font-family="Inter" font-weight="900" font-size="150" letter-spacing="20" fill="#e6e1d3">ПОТОП</text>
+      <text x="540" y="960" text-anchor="middle" font-family="Inter" font-weight="700" font-size="50" fill="#ff5444">Серия 3 — скоро</text>
+      <text x="540" y="1060" text-anchor="middle" font-family="Inter" font-weight="600" font-size="38" fill="#7d8e9a">подпишись, чтобы не пропустить</text></g>
+      <text x="540" y="1760" text-anchor="middle" font-family="Inter" font-weight="800" font-size="40" fill="#9fb2bf" opacity="${k}">Решай сам</text>`, noSub: true, vig: .5 }; });
 }
 
 const DEFS = `<defs>
