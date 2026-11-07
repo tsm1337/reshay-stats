@@ -38,15 +38,15 @@
   }
   // лодка с одеялом: head 0..1 — как высоко Аня показалась, lump — шевеление
   function boatBlanket(o = {}) {
-    const lump = o.lump ?? 0, head = o.head ?? 0;
+    const lump = o.lump ?? 0, head = o.head ?? 0, empty = !!o.empty;
     return `<g class="boat2">
       <path d="M0 90 Q300 130 600 90 L540 200 Q300 236 60 200Z" fill="#4a3426"/>
       <path d="M0 90 Q300 130 600 90 L588 112 Q300 152 12 112Z" fill="#6a4a34"/>
       <path d="M230 120 v80 M410 120 v80" stroke="#3a281d" stroke-width="12"/>
-      ${head > 0 ? `<g transform="translate(300 ${60 - head * 150}) scale(.9)"><g transform="translate(-100 -40)">
+      ${!empty && head > 0 ? `<g transform="translate(300 ${60 - head * 150}) scale(.9)"><g transform="translate(-100 -40)">
         <clipPath id="hc"><rect x="0" y="0" width="200" height="${48 + head * 140}"/></clipPath><g clip-path="url(#hc)">${A.anya({ opacity: 1 })}</g></g></g>` : ''}
-      <path d="M130 100 Q200 ${30 - lump * 24} 300 ${22 - lump * 40} Q400 ${30 - lump * 24} 470 100 Q300 134 130 100Z" fill="#5b6b55"/>
-      <path d="M200 90 Q250 ${60 - lump * 20} 300 ${56 - lump * 30} M300 56 Q350 ${60 - lump * 20} 400 90" stroke="#46543f" stroke-width="5" fill="none"/>
+      ${empty ? '' : `<path d="M130 100 Q200 ${30 - lump * 24} 300 ${22 - lump * 40} Q400 ${30 - lump * 24} 470 100 Q300 134 130 100Z" fill="#5b6b55"/>
+      <path d="M200 90 Q250 ${60 - lump * 20} 300 ${56 - lump * 30} M300 56 Q350 ${60 - lump * 20} 400 90" stroke="#46543f" stroke-width="5" fill="none"/>`}
     </g>`;
   }
   // кольцо волны от свистка
@@ -59,5 +59,15 @@
     return `<g>${bgCellar({ wy, t: o.t, calm: o.calm, lamp: o.lamp })}
       <g transform="translate(${o.bx ?? 240} ${wy - 150 + (o.bob ?? 0)})">${boatBlanket(o)}</g></g>`;
   }
-  Object.assign(A, { bgCellar, crowd, boatBlanket, ring, bgCellarBoat });
+  // собака-силуэт (viewBox 0 0 200 200, лапы на y=190); howl — морда вверх, пасть открыта
+  function dog(o = {}) {
+    const f = '#0b1016', st = '#2c4552';
+    const head = o.howl ? `<g transform="rotate(-48 140 120)"><ellipse cx="150" cy="104" rx="26" ry="20" fill="${f}" stroke="${st}" stroke-width="3"/><path d="M168 98 L204 80 L204 96 L172 112Z" fill="${f}" stroke="${st}" stroke-width="3"/><path d="M172 104 L200 100" stroke="#05080b" stroke-width="5"/><path d="M134 92 l-6 -22 l16 12Z" fill="${f}" stroke="${st}" stroke-width="3"/></g>`
+      : `<ellipse cx="156" cy="112" rx="26" ry="21" fill="${f}" stroke="${st}" stroke-width="3"/><path d="M174 110 L204 120 L200 134 L172 128Z" fill="${f}" stroke="${st}" stroke-width="3"/><path d="M142 96 l-4 -24 l18 14Z" fill="${f}" stroke="${st}" stroke-width="3"/><circle cx="160" cy="108" r="3.2" fill="#a9dbe3"/>`;
+    return `<g class="dog"><path d="M52 150 Q30 130 38 104" fill="none" stroke="${st}" stroke-width="10" stroke-linecap="round"/>
+      <ellipse cx="100" cy="150" rx="56" ry="30" fill="${f}" stroke="${st}" stroke-width="3"/>
+      <rect x="62" y="160" width="16" height="30" rx="6" fill="${f}" stroke="${st}" stroke-width="3"/><rect x="122" y="160" width="16" height="30" rx="6" fill="${f}" stroke="${st}" stroke-width="3"/>
+      <path d="M128 140 L146 118" stroke="${f}" stroke-width="30" stroke-linecap="round"/>${head}</g>`;
+  }
+  Object.assign(A, { bgCellar, crowd, boatBlanket, ring, bgCellarBoat, dog });
 })(window);
