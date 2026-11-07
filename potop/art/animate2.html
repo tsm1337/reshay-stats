@@ -90,10 +90,10 @@ function buildScenes() {
   { const [a, b] = nx(); sc(a, b, t => { const hit = T(9) - .1, sh = t >= hit ? Math.max(0, 1 - (t - hit) / 1.2) : 0, lamp = t > T(11) - .1 && t < T(11) + .5 ? ((t * 14 | 0) % 2 ? .25 : 1) : 1;
     return { w: `<g transform="${cam(1.2, 540, 500, noise(t, 3) * 1.2 * sh, noise(t, 4) * 22 * sh, noise(t + 2, 4) * 18 * sh)}">${A.bgCellar({ wy: 1450, t, lamp })}<g transform="rotate(${Math.sin(t * 4) * 6 * (t > hit ? 1 : .2)} 540 170)"><circle cx="540" cy="268" r="34" fill="#f3dc96" opacity="${lamp * .5}" filter="url(#blur6)"/></g></g>${dust(t, 40)}${flash(t, hit, .15, '#fff', .15)}`, vig: 1 }; }); }
   // 3. Внизу нас десять
-  { const [a, b] = nx(); sc(a, b, t => { const k = E(t, a, b); return { w: `<g transform="${cam(lerp(1.0, 1.35, k), 540, lerp(1000, 1200, k), 0, noise(t, .4) * 3, 0)}">${A.bgCellar({ wy: 1350, t })}${A.crowd(1390)}${waterOver(1390, .35)}</g>${dust(t, 20)}` }; }); }
+  { const [a, b] = nx(); sc(a, b, t => { const k = E(t, a, b); return { w: `<g transform="${cam(lerp(1.0, 1.35, k), 540, lerp(1000, 1200, k), 0, noise(t, .4) * 3, 0)}">${A.bgCellar({ wy: 1425, t })}${A.crowd(1430)}${waterOver(1425, .35)}</g>${dust(t, 20)}` }; }); }
   // 4. Бабушка, студенты, мужчина с собакой — проход камерой по толпе
   { const [a, b] = nx(); sc(a, b, t => { const k = E(t, a, b - .2), cx = lerp(150, 900, k);
-    return { w: `<g transform="${cam(2.3, cx, 1190, 0, 0, 120)}">${A.bgCellar({ wy: 1330, t })}${A.crowd(1390)}<g transform="translate(840 1350) scale(.9) translate(-100 -190)">${A.dog()}</g>${waterOver(1390, .4)}</g>${dust(t, 16)}`, vig: 1 }; }); }
+    return { w: `<g transform="${cam(2.3, cx, 1190, 0, 0, 120)}">${A.bgCellar({ wy: 1425, t })}${A.crowd(1430)}<g transform="translate(840 1450) scale(.9) translate(-100 -190)">${A.dog()}</g>${waterOver(1425, .4)}</g>${dust(t, 16)}`, vig: 1 }; }); }
   // 5. Одна лодка, на одного
   { const [a, b] = nx(); sc(a, b, t => { const k = E(t, a, b); return { w: `<g transform="${cam(lerp(1.0, 1.9, k), 540, lerp(1000, 1200, k))}">${A.bgCellarBoat({ wy: 1250, t, bob: Math.sin(t * 1.8) * 6, lump: 0, bx: 240 })}</g>${dust(t, 16)}`, vig: 1 }; }); }
   // 6. Надпись на борту «ТОЛЬКО ОДИН»
@@ -102,7 +102,7 @@ function buildScenes() {
     <g transform="translate(540 960) scale(${lerp(1.0, 1.12, E(t, a, b))}) translate(-540 -960)"><path d="M-40 760 Q540 840 1120 760 L1040 1160 Q540 1230 40 1160Z" fill="#4a3426"/><path d="M-40 760 Q540 840 1120 760 L1105 810 Q540 890 -25 810Z" fill="#6a4a34"/><path d="M60 930 H1020 M80 1010 H1000" stroke="#3a281d" stroke-width="8" opacity=".6"/>
     <text x="540" y="1060" text-anchor="middle" font-family="Inter" font-weight="900" font-size="150" letter-spacing="14" fill="#e6e1d3" opacity="${k}" transform="rotate(-1.5 540 1020)">ТОЛЬКО ОДИН</text></g>${dust(t, 12)}`, vig: 1 }; }); }
   // 7. Вода поднимается до колен, пахнет железом
-  { const [a, b] = nx(); sc(a, b, t => { const wy = lerp(1450, 1020, E(t, T(33) - .1, T(36) + .3)); return { w: `<g transform="${cam(1.1, 540, 1100, noise(t, 1) * 1.2)}">${A.bgCellar({ wy, t })}${A.crowd(1450)}${waterOver(wy, .55)}</g>${dust(t, 16)}` }; }); }
+  { const [a, b] = nx(); sc(a, b, t => { const wy = lerp(1425, 1350, E(t, T(33) - .1, T(36) + .3)); return { w: `<g transform="${cam(1.1, 540, 1100, noise(t, 1) * 1.2)}">${A.bgCellar({ wy, t })}${A.crowd(1430)}${waterOver(wy, .55)}</g>${dust(t, 16)}` }; }); }
   // 8. Телефон
   { const [a, b] = nx(); sc(a, b, t => { const k = E(t, a, a + .5); return { w: `<rect width="1080" height="1920" fill="#10151b"/><rect width="1080" height="1920" fill="url(#lampR)" opacity=".6"/>
     <g transform="translate(540 480) scale(${lerp(.9, 1.25, k)}) translate(-130 -55)">${A.clock((t * 2 | 0) % 2 ? '23 12' : '23:12')}</g>
@@ -112,17 +112,17 @@ function buildScenes() {
     <g transform="${cam(lerp(3.1, 3.6, E(t, a, b)), 540, 1166, 0, noise(t, .5) * 3, 0)}">${put(A.ilya({ blink: blinkAt(t, 2.9) }), 540, 1720, 2.05)}</g>
     <g transform="translate(900 240) scale(.6) translate(-130 -55)" opacity="${.9}">${A.clock((t * 2 | 0) % 2 ? '23 18' : '23:18')}</g>${dust(t, 14)}`, vig: 1 })); }
   // 10. Кто-то закричал — давка
-  { const [a, b] = nx(); sc(a, b, t => { const sh = E(t, T(57), T(57) + .3); return { w: `<g transform="${cam(1.25, 700, 1150, noise(t, 2) * 1.5, noise(t, 5) * 14 * sh, noise(t + 1, 5) * 10 * sh)}">${A.bgCellar({ wy: 1050, t })}<g transform="translate(480 ${900 + Math.sin(t * 3) * 10})">${A.boatBlanket({ lump: .3 })}</g>${A.crowd(1150, { push: true, t })}${waterOver(1150, .5)}</g><rect width="1080" height="1920" fill="#8a0f0f" opacity="${.12 * sh}"/>${dust(t, 20)}` }; }); }
+  { const [a, b] = nx(); sc(a, b, t => { const sh = E(t, T(57), T(57) + .3); return { w: `<g transform="${cam(1.25, 700, 1150, noise(t, 2) * 1.5, noise(t, 5) * 14 * sh, noise(t + 1, 5) * 10 * sh)}">${A.bgCellar({ wy: 1350, t })}<g transform="translate(480 ${1200 + Math.sin(t * 3) * 10})">${A.boatBlanket({ lump: .3 })}</g>${A.crowd(1430, { push: true, t })}${waterOver(1350, .5)}</g><rect width="1080" height="1920" fill="#8a0f0f" opacity="${.12 * sh}"/>${dust(t, 20)}` }; }); }
   // 11. Давка, собака воет
   { const [a, b] = nx(); sc(a, b, t => { const sh = noise(t, 5) * 18, h = E(t, T(64) - .1, T(64) + .3); return { w: `<rect width="1080" height="1920" fill="#0d1014"/><rect width="1080" height="1920" fill="url(#flashC)"/>
-    <g transform="${cam(lerp(1.2, 1.5, E(t, a, b)), 540, 1100, 0, sh * (1 - h * .6), Math.abs(sh) * .4)}">${A.crowd(1500, { push: true, t: t * 2 })}<g transform="translate(540 1600) scale(${lerp(2.2, 2.8, h)}) translate(-100 -190)">${A.dog({ howl: h > .5 })}</g></g><rect width="1080" height="1920" fill="#8a0f0f" opacity="${.14}"/>${dust(t, 24)}`, vig: 1 }; }); }
+    <g transform="${cam(lerp(1.2, 1.5, E(t, a, b)), 540, 1100, 0, sh * (1 - h * .6), Math.abs(sh) * .4)}">${A.crowd(1430, { push: true, t: t * 2 })}${waterOver(1350, .45)}<g transform="translate(540 1500) scale(${lerp(2.2, 2.8, h)}) translate(-100 -190)">${A.dog({ howl: h > .5 })}</g>${waterOver(1420, .5)}</g><rect width="1080" height="1920" fill="#8a0f0f" opacity="${.14}"/>${dust(t, 24)}`, vig: 1 }; }); }
   // 12. Вера встаёт между ними и лодкой
-  { const [a, b] = nx(); sc(a, b, t => { const k = E(t, a, a + .8); return { w: `<g transform="${cam(1.0, 540, 1000)}">${A.bgCellarBoat({ wy: 1150, t, bx: 480, bob: Math.sin(t * 1.4) * 5 })}<g opacity=".7">${A.crowd(1150)}</g>${put(A.vera({ beam: true }), lerp(1300, 330, k), 1700, 2.0)}${waterOver(1150, .5)}</g>${dust(t, 16)}` }; }); }
+  { const [a, b] = nx(); sc(a, b, t => { const k = E(t, a, a + .8); return { w: `<g transform="${cam(1.0, 540, 1000)}">${A.bgCellarBoat({ wy: 1350, t, bx: 480, bob: Math.sin(t * 1.4) * 5 })}<g opacity=".7">${A.crowd(1430)}</g>${put(A.vera({ beam: true }), lerp(1300, 330, k), 1460, 2.0)}${waterOver(1350, .5)}</g>${dust(t, 16)}` }; }); }
   // 13. «Решайте сами»
   { const [a, b] = nx(); sc(a, b, t => ({ w: `<rect width="1080" height="1920" fill="#0a0d11"/><circle cx="540" cy="780" r="700" fill="url(#flashC)" opacity=".9"/>
     <g transform="${cam(lerp(3.3, 3.7, E(t, a, b)), 560, 1166, 0, noise(t, .4) * 3, 0)}">${put(A.vera({ beam: false }), 540, 1720, 2.05)}</g>${dust(t, 14)}`, vig: 1 })); }
   // 14. Никто не двигался, вода шумит у ступеней
-  { const [a, b] = nx(); sc(a, b, t => { const k = E(t, a, b); return { w: `<g transform="${cam(lerp(1.5, 2.1, k), lerp(200, 330, k), lerp(1150, 1280, k))}">${A.bgCellar({ wy: 1260 + Math.sin(t * 2.2) * 14, t })}<g opacity=".85">${A.crowd(1300)}</g>${waterOver(1300 + Math.sin(t * 2.2) * 14, .35)}</g>${dust(t, 16)}`, vig: 1 }; }); }
+  { const [a, b] = nx(); sc(a, b, t => { const k = E(t, a, b); return { w: `<g transform="${cam(lerp(1.5, 2.1, k), lerp(200, 330, k), lerp(1150, 1280, k))}">${A.bgCellar({ wy: 1350 + Math.sin(t * 2.2) * 7, t })}<g opacity=".85">${A.crowd(1430)}</g>${waterOver(1350 + Math.sin(t * 2.2) * 7, .4)}</g>${dust(t, 16)}`, vig: 1 }; }); }
   // 15. Кашель, все смотрят
   { const [a, b] = nx(); sc(a, b, t => { const c = E(t, T(86), T(86) + .15) * (1 - E(t, T(86) + .6, T(86) + 1.0)), sh = noise(t, 6) * 16 * c;
     return { w: `<rect width="1080" height="1920" fill="#0a0d11"/><circle cx="540" cy="900" r="620" fill="url(#flashC)" opacity=".7"/>${eyesRow(t, T(87) - .2)}
