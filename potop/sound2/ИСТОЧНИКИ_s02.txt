@@ -1,0 +1,7 @@
+ПОТОП, серия 2 — источники звука (все CC0 1.0, https://creativecommons.org/publicdomain/zero/1.0/)
+whistle.wav — «referee-whistle-blow-gymnasium», SpliceSound (Freesound #218318), через Wikimedia Commons: https://commons.wikimedia.org/w/index.php?curid=116753044
+oga/water_drops.mp3 — «Water Drops», ceoxblackj, https://opengameart.org/content/water-drops
+oga/creature/*.ogg — «80 CC0 creature SFX», rubberduck, https://opengameart.org/content/80-cc0-creature-sfx  (лай, вой, кашель, дыхание, крик, стон)
+oga/crowd_shouting.ogg — «Crowd Shouting/Speaking Ambience», Chasersgaming, https://opengameart.org/content/crowd-shoutingspeaking-ambience
+Остальное (дождь, гром, ветер, скрипы, шаги, плеск, удары, сердце, дрон) — из ../sound, см. ../ИСТОЧНИКИ.txt
+Подбор: Openverse API (api.openverse.org, license=cc0). Freesound из облака блокирует загрузку (403), поэтому берём OpenGameArt и Wikimedia Commons.
