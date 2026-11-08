@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-08T13:08Z",
- "subscribers": 10,
+ "updated": "2026-11-08T18:44Z",
+ "subscribers": 13,
  "videos": [
   {
    "id": "Uoz6MM5rBj8",
    "title": "Заказ без адреса · Серия 1 «Конверт» #shorts",
    "published": "2026-11-04T11:45:27+00:00",
-   "views": 1758,
+   "views": 1769,
    "likes": 29,
    "comments": 16
   },
@@ -30,7 +30,7 @@
    "id": "PV5pte3_rek",
    "title": "Заказ без адреса · Серия 4 «Двое из трёх» #shorts",
    "published": "2026-11-06T15:42:30+00:00",
-   "views": 233,
+   "views": 245,
    "likes": 4,
    "comments": 9
   },
@@ -38,7 +38,7 @@
    "id": "IKV_tRE1Fc4",
    "title": "Потоп · Серия 1 #shorts",
    "published": "2026-11-06T17:42:51+00:00",
-   "views": 1391,
+   "views": 1508,
    "likes": 22,
    "comments": 2
   },
@@ -46,7 +46,7 @@
    "id": "Y9WTA1jwcrM",
    "title": "Заказ без адреса · Серия 5 «Последний рейс» #shorts",
    "published": "2026-11-07T16:24:38+00:00",
-   "views": 471,
+   "views": 503,
    "likes": 5,
    "comments": 2
   },
@@ -54,8 +54,16 @@
    "id": "BIt8Dd4T4jM",
    "title": "Потоп · Серия 2 #shorts",
    "published": "2026-11-07T17:15:02+00:00",
-   "views": 1233,
+   "views": 1254,
    "likes": 15,
+   "comments": 0
+  },
+  {
+   "id": "HhpO0uVoG84",
+   "title": "Потоп · Серия 3 «Код» #shorts",
+   "published": "2026-11-08T15:08:19+00:00",
+   "views": 419,
+   "likes": 13,
    "comments": 0
   }
  ]
