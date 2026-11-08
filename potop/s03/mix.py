@@ -57,7 +57,20 @@ ev(creak, 2.3, 2.5, T(135), -11, 'lowpass=f=1000,asetrate=44100*0.65,aresample=4
 # Вера достала свисток
 ev(hit, 0, .24, T(140) + .3, -13, 'highpass=f=1200,aecho=0.8:0.8:200:0.4')
 ev(hit, 0, .24, T(145) - .05, -9, 'lowpass=f=900,aecho=0.8:0.9:320:0.5')
-ev(beat, 0, .9, T(145) + .35, -6, 'lowpass=f=700'); ev(beat, 0, .9, T(145) + 1.3, -7, 'lowpass=f=700')
+
+
+# --- концовка: вместе свистят, вода останавливается, свисток от отца
+ev(c('breath.ogg'), 0, .67, T(147) - .3, -14, 'lowpass=f=1500,aecho=0.8:0.6:120:0.3')
+ev(whistle, 0.0, 1.8, T(155) - .02, -10, 'highpass=f=500,aecho=0.8:0.7:170|330:0.5|0.3,' + fd(1.8, .02, .8))
+ev(whistle, 0.0, 1.8, T(155) + .02, -13, 'asetrate=44100*0.94,aresample=44100,highpass=f=500,aecho=0.8:0.7:200|380:0.5|0.3,' + fd(1.8, .02, .9))
+ev(rock, 0, 1.15, T(155) + .05, -17, 'lowpass=f=1500,aecho=0.8:0.6:90:0.4')
+ev(splash, 0.5, 2.0, T(156) + .2, -22, 'lowpass=f=800,' + fd(2.0, .2, 1.4))
+ev(hit, 0, .24, T(162) + .2, -16, 'lowpass=f=500,aecho=0.8:0.9:300:0.5')
+for i in range(3): ev(beat, 0, .9, T(165) + i * .9, -9 - i, 'lowpass=f=800')
+ev(hit, 0, .24, T(176) + .1, -13, 'highpass=f=1200,aecho=0.8:0.8:220:0.4')
+ev(creak, 3, 2.5, T(178) - .1, -13, 'lowpass=f=900,asetrate=44100*0.6,aresample=44100,' + fd(2.5, .2, 1.4))
+ev(hit, 0, .24, T(181) - .1, -9, 'lowpass=f=600,aecho=0.8:0.9:340:0.5')
+ev(beat, 0, .9, T(181) + .3, -6, 'lowpass=f=700'); ev(beat, 0, .9, T(181) + 1.3, -8, 'lowpass=f=700')
 
 cmd = ['ffmpeg', '-loglevel', 'error', '-y', '-i', os.path.join(H, 'voice_short.wav'), '-i', os.path.join(S1, 'drone2.ogg')]
 fc = [f'[0:a]aformat=sample_rates=44100:channel_layouts=stereo,volume={VOICE_GAIN}dB,apad=whole_dur={DUR:.2f}[v]',
