@@ -11,7 +11,7 @@
     for (let y = 300, r = 0; y < 1500; y += 70, r++) for (let x = (r % 2) * 60; x < 1080; x += 120) bricks += `M${x} ${y} v70 `;
     let wl = '';
     if (calm) wl = `<rect x="0" y="${wy}" width="1080" height="${1920 - wy}" fill="#0b1c24"/><path d="M0 ${wy} H1080" stroke="#4d8696" stroke-width="3"/>
-      <ellipse cx="540" cy="${wy + 140}" rx="300" ry="40" fill="${P.lampSoft}" opacity=".12"/><path d="M420 ${wy + 20} v300 M540 ${wy + 20} v420 M660 ${wy + 20} v260" stroke="${P.lampSoft}" stroke-width="3" opacity=".14"/>`;
+      <ellipse cx="540" cy="${wy + 75}" rx="260" ry="16" fill="${P.lampSoft}" opacity=".08"/>`;
     else wl = A.water(wy, 7, t);
     return `<g class="bg-cellar">
       <rect width="1080" height="1920" fill="#101418"/>
@@ -44,10 +44,14 @@
       <path d="M0 90 Q300 130 600 90 L588 112 Q300 152 12 112Z" fill="#6a4a34"/>
       <path d="M230 120 v80 M410 120 v80" stroke="#3a281d" stroke-width="12"/>
       ${!empty && head > 0 ? `<g transform="translate(300 ${60 - head * 150}) scale(.9)"><g transform="translate(-100 -40)">
-        <clipPath id="hc"><rect x="0" y="0" width="200" height="${48 + head * 140}"/></clipPath><g clip-path="url(#hc)">${A.anya({ opacity: 1 })}</g></g></g>` : ''}
+        <clipPath id="hc"><rect x="0" y="0" width="200" height="${48 + head * 140}"/></clipPath><g clip-path="url(#hc)">${(o.open ? anyaOpen : A.anya)({ opacity: 1 })}</g></g></g>` : ''}
       ${empty ? '' : `<path d="M130 100 Q200 ${30 - lump * 24} 300 ${22 - lump * 40} Q400 ${30 - lump * 24} 470 100 Q300 134 130 100Z" fill="#5b6b55"/>
       <path d="M200 90 Q250 ${60 - lump * 20} 300 ${56 - lump * 30} M300 56 Q350 ${60 - lump * 20} 400 90" stroke="#46543f" stroke-width="5" fill="none"/>`}
     </g>`;
+  }
+  // Аня с открытыми глазами и кругами под глазами
+  function anyaOpen(o = {}) {
+    return A.anya(o).replace(/<path d="M79 99[^>]*\/>/, '<ellipse cx="86" cy="108" rx="8" ry="3" fill="#7a6a96" opacity=".4"/><ellipse cx="114" cy="108" rx="8" ry="3" fill="#7a6a96" opacity=".4"/><ellipse cx="86" cy="99" rx="4" ry="5" fill="#101317"/><ellipse cx="114" cy="99" rx="4" ry="5" fill="#101317"/><circle cx="87.5" cy="97" r="1.3" fill="#fff"/><circle cx="115.5" cy="97" r="1.3" fill="#fff"/>');
   }
   // кольцо волны от свистка
   function ring(cx, cy, r, op = 1) {
@@ -69,5 +73,5 @@
       <rect x="62" y="160" width="16" height="30" rx="6" fill="${f}" stroke="${st}" stroke-width="3"/><rect x="122" y="160" width="16" height="30" rx="6" fill="${f}" stroke="${st}" stroke-width="3"/>
       <path d="M128 140 L146 118" stroke="${f}" stroke-width="30" stroke-linecap="round"/>${head}</g>`;
   }
-  Object.assign(A, { bgCellar, crowd, boatBlanket, ring, bgCellarBoat, dog });
+  Object.assign(A, { bgCellar, crowd, boatBlanket, ring, bgCellarBoat, dog, anyaOpen });
 })(window);
