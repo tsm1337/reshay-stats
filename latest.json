@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-09T11:14Z",
- "subscribers": 13,
+ "updated": "2026-11-09T22:12Z",
+ "subscribers": 16,
  "videos": [
   {
    "id": "Uoz6MM5rBj8",
    "title": "Заказ без адреса · Серия 1 «Конверт» #shorts",
    "published": "2026-11-04T11:45:27+00:00",
-   "views": 1773,
+   "views": 1777,
    "likes": 29,
    "comments": 16
   },
@@ -14,7 +14,7 @@
    "id": "ahX2bma-k80",
    "title": "Заказ без адреса · Серия 2 «Ячейка 47» #shorts",
    "published": "2026-11-04T15:28:13+00:00",
-   "views": 1319,
+   "views": 1321,
    "likes": 24,
    "comments": 17
   },
@@ -22,7 +22,7 @@
    "id": "fZnPlI0iKGg",
    "title": "Заказ без адреса · Серия 3 «Диспетчер» #shorts",
    "published": "2026-11-05T17:08:21+00:00",
-   "views": 363,
+   "views": 367,
    "likes": 8,
    "comments": 7
   },
@@ -30,7 +30,7 @@
    "id": "PV5pte3_rek",
    "title": "Заказ без адреса · Серия 4 «Двое из трёх» #shorts",
    "published": "2026-11-06T15:42:30+00:00",
-   "views": 251,
+   "views": 252,
    "likes": 4,
    "comments": 9
   },
@@ -38,32 +38,40 @@
    "id": "IKV_tRE1Fc4",
    "title": "Потоп · Серия 1 #shorts",
    "published": "2026-11-06T17:42:51+00:00",
-   "views": 1778,
-   "likes": 24,
+   "views": 1782,
+   "likes": 25,
    "comments": 2
   },
   {
    "id": "Y9WTA1jwcrM",
    "title": "Заказ без адреса · Серия 5 «Последний рейс» #shorts",
    "published": "2026-11-07T16:24:38+00:00",
-   "views": 615,
-   "likes": 7,
+   "views": 632,
+   "likes": 6,
    "comments": 2
   },
   {
    "id": "BIt8Dd4T4jM",
    "title": "Потоп · Серия 2 #shorts",
    "published": "2026-11-07T17:15:02+00:00",
-   "views": 1298,
-   "likes": 17,
+   "views": 1498,
+   "likes": 18,
    "comments": 0
   },
   {
    "id": "HhpO0uVoG84",
    "title": "Потоп · Серия 3 «Код» #shorts",
    "published": "2026-11-08T15:08:19+00:00",
-   "views": 1098,
+   "views": 1107,
    "likes": 16,
+   "comments": 0
+  },
+  {
+   "id": "IoRagrw34Cs",
+   "title": "Озеро ушло в слив за несколько часов. Как это вышло?",
+   "published": "2026-11-09T17:16:39+00:00",
+   "views": 1324,
+   "likes": 20,
    "comments": 0
   }
  ]
