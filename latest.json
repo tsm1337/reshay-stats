@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-11T09:10Z",
- "subscribers": 18,
+ "updated": "2026-11-11T17:49Z",
+ "subscribers": 24,
  "videos": [
   {
    "id": "Uoz6MM5rBj8",
@@ -54,7 +54,7 @@
    "id": "BIt8Dd4T4jM",
    "title": "Потоп · Серия 2 #shorts",
    "published": "2026-11-07T17:15:02+00:00",
-   "views": 1614,
+   "views": 1652,
    "likes": 18,
    "comments": 0
   },
@@ -62,7 +62,7 @@
    "id": "HhpO0uVoG84",
    "title": "Потоп · Серия 3 «Код» #shorts",
    "published": "2026-11-08T15:08:19+00:00",
-   "views": 1362,
+   "views": 1383,
    "likes": 20,
    "comments": 0
   },
@@ -70,17 +70,25 @@
    "id": "IoRagrw34Cs",
    "title": "Озеро ушло в слив за несколько часов. Как это вышло?",
    "published": "2026-11-09T17:16:39+00:00",
-   "views": 4091,
-   "likes": 69,
-   "comments": 1
+   "views": 6555,
+   "likes": 98,
+   "comments": 3
   },
   {
    "id": "1ZOWQPKPsMc",
    "title": "Её украли, а она лежала в земле. История закопанного Ferrari #shorts",
    "published": "2026-11-10T10:18:57+00:00",
-   "views": 1405,
+   "views": 1433,
    "likes": 19,
    "comments": 0
+  },
+  {
+   "id": "o5WtGqO7S78",
+   "title": "Один человек остановил ядерную войну. Ночь 26 сентября 1983",
+   "published": "2026-11-11T12:33:02+00:00",
+   "views": 917,
+   "likes": 42,
+   "comments": 1
   }
  ]
 }
